@@ -8,22 +8,22 @@ namespace api_raiz.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string Nome { get; set; }
+        public string Name { get; set; }
         [Required]
-        public int Tamanho { get; set; }
+        public int Size { get; set; }
         [Required]
-        public double Preco { get; set; }
-        public int QuantidadeRestante { get; set; }
+        public double Price { get; set; }
+        public int RemainingAmount { get; set; }
+        public int SoldAmount { get; set; }
 
-        public Product() { }
-
-        public Product(int id, string nome, int tamanho, double preco, int quantidadeRestante)
+        public Product(int id, string name, int size, double price, int remainingAmount)
         {
             Id = id;
-            Nome = nome;
-            Tamanho = tamanho;
-            Preco = preco;
-            QuantidadeRestante = quantidadeRestante;
+            Name = name;
+            Size = size;
+            Price = price;
+            RemainingAmount = remainingAmount;
+            SoldAmount = 0;
         }
     }
 }

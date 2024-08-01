@@ -56,12 +56,12 @@ namespace api_raiz.Controllers
                     var product = context.Products.FirstOrDefault(p => p.Id == item.Id);
                     if (product != null)
                     {
-                        product.QuantidadeRestante -= item.Quantity;
+                        product.RemainingAmount -= item.Quantity;
+                        product.SoldAmount += item.Quantity;
                     }
                 }
                 context.SaveChanges();
             }
-
             return Ok();
         }
     }
