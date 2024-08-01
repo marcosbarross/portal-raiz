@@ -29,17 +29,20 @@ namespace api_raiz.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Nome")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("Preco")
+                    b.Property<double>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("QuantidadeRestante")
+                    b.Property<int>("RemainingAmount")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Tamanho")
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SoldAmount")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

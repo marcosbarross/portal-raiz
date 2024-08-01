@@ -17,10 +17,11 @@ namespace api_raiz.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nome = table.Column<string>(type: "text", nullable: false),
-                    Tamanho = table.Column<int>(type: "integer", nullable: false),
-                    Preco = table.Column<double>(type: "double precision", nullable: false),
-                    QuantidadeRestante = table.Column<int>(type: "integer", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Size = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false),
+                    RemainingAmount = table.Column<int>(type: "integer", nullable: false),
+                    SoldAmount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
