@@ -33,7 +33,7 @@ function Itens() {
 
   const handleAddProduto = (e) => {
     e.preventDefault();
-    const newProduto = { nome, preco: parseFloat(preco), tamanho, quantidadeRestante: parseInt(estoque) };
+    const newProduto = { name: nome, price: parseFloat(preco), size: tamanho, remainingAmount: parseInt(estoque), soldAmount: 0 };
     axios.post(`${getApiUrl()}/AddProduct`, newProduto)
       .then(() => {
         loadProdutos();
@@ -104,10 +104,10 @@ function Itens() {
           <tbody>
             {produtos.map(produto => (
               <tr key={produto.Id}>
-                <td>{produto.Nome}</td>
-                <td>{produto.Preco}</td>
-                <td>{produto.Tamanho}</td>
-                <td>{produto.QuantidadeRestante}</td>
+                <td>{produto.Name}</td>
+                <td>{produto.Price}</td>
+                <td>{produto.Size}</td>
+                <td>{produto.RemainingAmount}</td>
                 <td>
                   <Button variant="danger" onClick={() => handleDeleteProduto(produto.Id)}>Excluir</Button>
                 </td>
