@@ -5,17 +5,28 @@ import CustomNavbar from '../components/CustomNavbar';
 import getApiUrl from '../util/api';
 
 function RelatorioVendas() {
-  const [relatorio, setRelatorio] = useState({ itens: [], total_vendido: 0 });
+  const [produtos, setProdutos] = useState([]);
 
-  const carregarRelatorio = useCallback(() => {
-    axios.get(`${getApiUrl()}/relatorio_vendas/`)
-      .then(response => setRelatorio(response.data))
-      .catch(error => console.error('Error loading sales report:', error));
+  const carregarProdutos = useCallback(() => {
+    axios.get(`${getApiUrl()}/GetProducts`)
+      .then(response => {
+        if (response.data && response.data.$values) {
+          setProdutos(response.data.$values);
+        } else {
+          console.error('API response is not in expected format:', response.data);
+          setProdutos([]);
+        }
+      })
+      .catch(error => console.error('Error loading products:', error));
   }, []);
 
   useEffect(() => {
-    carregarRelatorio();
-  }, [carregarRelatorio]);
+    carregarProdutos();
+  }, [carregarProdutos]);
+
+  const calcularTotalVendido = () => {
+    return produtos.reduce((total, produto) => total + (produto.SoldAmount * produto.Price), 0).toFixed(2);
+  };
 
   return (
     <>
@@ -31,16 +42,16 @@ function RelatorioVendas() {
             </tr>
           </thead>
           <tbody>
-            {relatorio.itens.map(item => (
-              <tr key={item.produto_id}>
-                <td>{item.produto_nome}</td>
-                <td>{item.quantidade_vendida}</td>
-                <td>{item.total_vendido.toFixed(2)}</td>
+            {produtos.map(produto => (
+              <tr key={produto.Id}>
+                <td>{produto.Name}</td>
+                <td>{produto.SoldAmount}</td>
+                <td>R$ {(produto.SoldAmount * produto.Price).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
         </Table>
-        <h4 className="mt-4">Total Geral Vendido: {relatorio.total_vendido.toFixed(2)}</h4>
+        <h4 className="mt-4">Total geral vendido: R$ {calcularTotalVendido()}</h4>
       </Container>
     </>
   );
