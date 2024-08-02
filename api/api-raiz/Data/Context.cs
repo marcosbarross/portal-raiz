@@ -9,10 +9,16 @@ namespace api_raiz.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=portal_raiz;Username=postgres;Password=root;");
+            var host = Environment.GetEnvironmentVariable("DB_HOST");
+            var port = Environment.GetEnvironmentVariable("DB_PORT");
+            var database = Environment.GetEnvironmentVariable("DB_NAME");
+            var username = Environment.GetEnvironmentVariable("DB_USER");
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+            optionsBuilder.UseNpgsql(connectionString);
         }
 
         public Context() { }
-        
     }
 }
