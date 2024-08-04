@@ -16,7 +16,7 @@ function Itens() {
   }, []);
 
   const loadProdutos = () => {
-    axios.get(`${getApiUrl()}/GetProducts`)
+    axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
         if (response.data && response.data.$values) {
           setProdutos(response.data.$values);
@@ -34,7 +34,7 @@ function Itens() {
   const handleAddProduto = (e) => {
     e.preventDefault();
     const newProduto = { name: nome, price: parseFloat(preco), size: tamanho, remainingAmount: parseInt(estoque), soldAmount: 0 };
-    axios.post(`${getApiUrl()}/AddProduct`, newProduto)
+    axios.post(`${getApiUrl()}/Product/AddProduct`, newProduto)
       .then(() => {
         loadProdutos();
         setNome('');
@@ -46,7 +46,7 @@ function Itens() {
   };
 
   const handleDeleteProduto = (id) => {
-    axios.delete(`${getApiUrl()}/DeleteProduct/${id}`)
+    axios.delete(`${getApiUrl()}/Product/DeleteProduct/${id}`)
       .then(() => loadProdutos())
       .catch(error => console.error('Error deleting product:', error));
   };
