@@ -12,6 +12,7 @@ function CustomNavbar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
+
             <NavDropdown title="Menu de vendas" id="basic-nav-dropdown">
               <LinkContainer to="/itens">
                 <NavDropdown.Item>Adicionar item</NavDropdown.Item>
@@ -26,6 +27,13 @@ function CustomNavbar() {
                 <NavDropdown.Item>Relatorio</NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
+
+            <NavDropdown title="Menu de eventos" id="basic-nav-dropdown">
+              <LinkContainer to="/novoFinanceiro">
+                <NavDropdown.Item>Adicionar evento</NavDropdown.Item>
+              </LinkContainer>
+            </NavDropdown>
+
             <LinkContainer to="/geradorRecibos">
               <Nav.Link>Gerador de recibos</Nav.Link>
             </LinkContainer>

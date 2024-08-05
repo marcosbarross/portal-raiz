@@ -30,6 +30,9 @@ namespace api_raiz.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<EventStudent>()
+                .HasKey(es => new { es.EventId, es.StudentId });
+
+            modelBuilder.Entity<EventStudent>()
                 .HasOne(es => es.Event)
                 .WithMany(e => e.EventStudents)
                 .HasForeignKey(es => es.EventId);

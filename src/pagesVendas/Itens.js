@@ -81,11 +81,11 @@ function Itens() {
               <option value="12">12</option>
               <option value="14">14</option>
               <option value="16">16</option>
-              <option value="PP">PP</option>
-              <option value="P">P</option>
-              <option value="M">M</option>
-              <option value="G">G</option>
-              <option value="GG">GG</option>
+              <option value="18">PP</option>
+              <option value="20">P</option>
+              <option value="22">M</option>
+              <option value="24">G</option>
+              <option value="26">GG</option>
             </Form.Select>
           </Form.Group>
           <Button type="submit" className="mt-3">Adicionar produto</Button>

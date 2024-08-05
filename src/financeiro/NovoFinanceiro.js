@@ -19,7 +19,7 @@ function NovoFinanceiro() {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get(`${getApiUrl()}/event`);
+            const response = await axios.get(`${getApiUrl()}/event/GetEvents`);
             if (Array.isArray(response.data.$values)) {
                 setEvents(response.data.$values);
             } else {
@@ -51,8 +51,8 @@ function NovoFinanceiro() {
     };
 
     const handleDetails = (id) => {
-        navigate(`/event/${id}`);
-    };
+        navigate(`/DetalheEvento/${id}`);
+    };    
 
     return (
         <>
@@ -108,7 +108,7 @@ function NovoFinanceiro() {
                     <Table striped className="mt-4">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>id</th>
                                 <th>Nome do evento</th>
                                 <th>Data</th>
                                 <th>Parcelas</th>
@@ -116,9 +116,9 @@ function NovoFinanceiro() {
                             </tr>
                         </thead>
                         <tbody>
-                            {events.map((event, index) => (
+                            {events.map((event) => (
                                 <tr key={event.Id}>
-                                    <td>{index + 1}</td>
+                                    <td>{event.Id}</td>
                                     <td>{event.Name}</td>
                                     <td>{new Date(event.Date).toLocaleDateString()}</td>
                                     <td>{event.Installments}</td>

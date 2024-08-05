@@ -7,6 +7,7 @@ import Pedidos from './pagesVendas/Pedidos';
 import RelatorioVendas from './pagesVendas/RelatorioVendas';
 import GeradorRecibos from './geradorRecibos/GeradorRecibos'
 import NovoFinanceiro from './financeiro/NovoFinanceiro';
+import DetalheEvento from './financeiro/DetalheEvento';
 const App = () => {
     return (
         <Router>
@@ -17,7 +18,8 @@ const App = () => {
                 <Route path="/pedidos" element={<Pedidos />} />
                 <Route path='/relatorio'element={<RelatorioVendas/>} />
                 <Route path='/geradorRecibos' element={<GeradorRecibos />} />
-                <Route path='novoFinanceiro' element={<NovoFinanceiro />}/>
+                <Route path='/novoFinanceiro' element={<NovoFinanceiro />}/>
+                <Route path='/DetalheEvento/:id' element={<DetalheEvento/>}/>
             </Routes>
         </Router>
     );
