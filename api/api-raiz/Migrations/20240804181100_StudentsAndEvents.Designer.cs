@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using api_raiz.Data;
@@ -11,9 +12,11 @@ using api_raiz.Data;
 namespace api_raiz.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240804181100_StudentsAndEvents")]
+    partial class StudentsAndEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,34 +36,21 @@ namespace api_raiz.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Installments")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("installments")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("studentNameregistration")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("studentNameregistration");
+
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("api_raiz.Models.EventStudent", b =>
-                {
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.HasKey("EventId", "StudentId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("EventStudents");
                 });
 
             modelBuilder.Entity("api_raiz.Models.Product", b =>
@@ -94,52 +84,34 @@ namespace api_raiz.Migrations
 
             modelBuilder.Entity("api_raiz.Models.Student", b =>
                 {
-                    b.Property<int>("Registration")
+                    b.Property<int>("registration")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Registration"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("registration"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Responsible")
+                    b.Property<string>("Responsanble")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Registration");
+                    b.HasKey("registration");
 
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("api_raiz.Models.EventStudent", b =>
-                {
-                    b.HasOne("api_raiz.Models.Event", "Event")
-                        .WithMany("EventStudents")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api_raiz.Models.Student", "Student")
-                        .WithMany("EventStudents")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("api_raiz.Models.Event", b =>
                 {
-                    b.Navigation("EventStudents");
-                });
+                    b.HasOne("api_raiz.Models.Student", "studentName")
+                        .WithMany()
+                        .HasForeignKey("studentNameregistration")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("api_raiz.Models.Student", b =>
-                {
-                    b.Navigation("EventStudents");
+                    b.Navigation("studentName");
                 });
 #pragma warning restore 612, 618
         }

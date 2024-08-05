@@ -16,7 +16,7 @@ function Vendas() {
   const [semTroco, setSemTroco] = useState(false);
 
   useEffect(() => {
-    axios.get(`${getApiUrl()}/GetProducts`)
+    axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
         if (response.data && response.data.$values) {
           setProdutos(response.data.$values);
@@ -53,7 +53,7 @@ function Vendas() {
             : item
         ));
       } else {
-        setItensPedido([...itensPedido, { productId: produto.Id, quantity: parseInt(quantidade), productName: produto.Name, productPrice: produto.Price }]);
+        setItensPedido([...itensPedido, { productId: produto.Id, productSize: produto.Size, quantity: parseInt(quantidade), productName: produto.Name, productPrice: produto.Price }]);
       }
       setProdutoId('');
       setQuantidade('');
@@ -93,7 +93,7 @@ function Vendas() {
     }));
 
     if (valorPago >= totalPedido) {
-      axios.post(`${getApiUrl()}/SellProduct`, order)
+      axios.post(`${getApiUrl()}/api/Product/SellProduct`, order)
         .then(response => {
           setItensPedido([]);
           alert('Pedido realizado com sucesso!');
@@ -197,6 +197,7 @@ function Vendas() {
           <thead>
             <tr>
               <th>Produto</th>
+              <th>Tamanho</th>
               <th>Quantidade</th>
               <th>Preço</th>
               <th>Subtotal</th>
@@ -207,6 +208,7 @@ function Vendas() {
             {itensPedido.map(item => (
               <tr key={item.productId}>
                 <td>{item.productName}</td>
+                <td>{item.productSize}</td>
                 <td>{item.quantity}</td>
                 <td>{item.productPrice.toFixed(2)}</td>
                 <td>{(item.productPrice * item.quantity).toFixed(2)}</td>

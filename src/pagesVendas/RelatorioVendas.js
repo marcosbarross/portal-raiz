@@ -8,7 +8,7 @@ function RelatorioVendas() {
   const [produtos, setProdutos] = useState([]);
 
   const carregarProdutos = useCallback(() => {
-    axios.get(`${getApiUrl()}/GetProducts`)
+    axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
         if (response.data && response.data.$values) {
           setProdutos(response.data.$values);
@@ -32,11 +32,12 @@ function RelatorioVendas() {
     <>
       <CustomNavbar />
       <Container className="mt-4">
-        <h2>Relatório de Vendas</h2>
+        <h2>Relatório de vendas</h2>
         <Table striped bordered hover>
           <thead>
             <tr>
               <th>Produto</th>
+              <th>Tamanho</th>
               <th>Quantidade Vendida</th>
               <th>Total Vendido</th>
             </tr>
@@ -45,6 +46,7 @@ function RelatorioVendas() {
             {produtos.map(produto => (
               <tr key={produto.Id}>
                 <td>{produto.Name}</td>
+                <td>{produto.Size}</td>
                 <td>{produto.SoldAmount}</td>
                 <td>R$ {(produto.SoldAmount * produto.Price).toFixed(2)}</td>
               </tr>

@@ -44,6 +44,23 @@ function Home() {
               </Card.Body>
             </Card>
           </Col>
+          <Col md={6} lg={4} className="mb-4">
+            <Card>
+              <Card.Img 
+                variant="top" 
+                src={require('./dinheiro.png')} 
+                className="card-img-limited"
+              />
+              <Card.Body className="text-center">
+                <Card.Title>Financeiro de eventos</Card.Title>
+                <Button variant="primary">
+                  <LinkContainer to={"/NovoFinanceiro"}>
+                    <Nav.Link>Abrir</Nav.Link>
+                  </LinkContainer>
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
         </Row>
       </Container>
     </>
