@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_raiz.Data;
 using api_raiz.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace api_raiz.Controllers
 {
@@ -18,14 +20,37 @@ namespace api_raiz.Controllers
                 return Ok();
             }
         }
-
+        
         [HttpGet("GetProducts")]
         public IActionResult GetProducts()
         {
             using (var context = new Context())
             {
+                var productsAlternativeSize = new List<ProductAlternativeSize>();
                 var products = context.Products.ToList();
-                return Ok(products);
+                var productsToRemove = new List<Product>();
+
+                foreach (var product in products)
+                {
+                    if (product.Size > 16)
+                    {
+                        var productAlternativeSize = new ProductAlternativeSize(product);
+                        productsAlternativeSize.Add(productAlternativeSize);
+                        productsToRemove.Add(product);
+                    }
+                }
+
+                foreach (var productToRemove in productsToRemove)
+                {
+                    products.Remove(productToRemove);
+                }
+
+                var response = new ProductResponse
+                {
+                    Products = products,
+                    ProductsAlternativeSize = productsAlternativeSize
+                };
+                return Ok(response);
             }
         }
 
