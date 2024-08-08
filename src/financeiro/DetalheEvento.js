@@ -53,7 +53,6 @@ function DetalheEvento() {
                 ...newStudent
             });
             setNewStudent({
-                Registration: '',
                 Name: '',
                 Responsible: ''
             });
@@ -64,6 +63,7 @@ function DetalheEvento() {
             alert('Erro ao adicionar aluno. Verifique se o aluno já está registrado no evento.');
         }
     };
+    
 
     const fetchParcelas = async (studentId) => {
         setLoadingParcelas({ ...loadingParcelas, [studentId]: true });
@@ -77,22 +77,37 @@ function DetalheEvento() {
             setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
         }
     };
-
     const handleCheckboxChange = (studentId, parcelaIndex) => {
         const updatedParcelas = { ...parcelas };
         if (Array.isArray(updatedParcelas[studentId])) {
-            const parcela = updatedParcelas[studentId][parcelaIndex];
-            if (!parcela.Paid) {
-                parcela.paid = !parcela.paid;
-            }
-            setParcelas(updatedParcelas);
+            const selectedParcela = updatedParcelas[studentId][parcelaIndex];
+    
+            const allPreviousPaid = updatedParcelas[studentId].slice(0, parcelaIndex).every(parcela => parcela.Paid || parcela.paid);
+    
+            if (allPreviousPaid) {
+                if (!selectedParcela.Paid) {
+                    selectedParcela.paid = !selectedParcela.paid;
+                }
+                setParcelas(updatedParcelas);
+            } else {
+                alert('Você só pode pagar parcelas consecutivas.');
+                window.location.reload();
+            }            
         } else {
             console.error('Parcelas não é um array:', updatedParcelas[studentId]);
         }
-    };
+    };    
+
+    
 
     const handlePagarParcelas = async (studentId) => {
-        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid);
+        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid).map(parcela => ({
+            InstallmentNumber: parcela.InstallmentNumber,
+            Paid: true,
+            EventId: id,
+            StudentId: studentId
+        }));
+    
         try {
             await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
             fetchParcelas(studentId);
@@ -101,6 +116,8 @@ function DetalheEvento() {
             alert('Erro ao pagar parcelas.');
         }
     };
+    
+    
 
     const handleToggleAccordion = (studentId) => {
         if (!parcelas[studentId]) {

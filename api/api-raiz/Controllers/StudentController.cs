@@ -126,7 +126,10 @@ namespace api_raiz.Controllers
 
                     if (eventStudent != null)
                     {
-                        eventStudent.PaidInstallments = installment.InstallmentNumber;
+                        if (installment.InstallmentNumber > eventStudent.PaidInstallments)
+                        {
+                            eventStudent.PaidInstallments = installment.InstallmentNumber;
+                        }
                     }
                 }
 
@@ -134,5 +137,6 @@ namespace api_raiz.Controllers
                 return Ok(new { message = "Parcelas pagas com sucesso." });
             }
         }
+
     }
 }
