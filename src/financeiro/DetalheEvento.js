@@ -155,7 +155,7 @@ function DetalheEvento() {
                             {event.Students.map(student => (
                                 <Accordion.Item eventKey={student.Registration.toString()} key={student.Registration}>
                                     <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
-                                        {student.Name} ({student.Registration})
+                                        {"Aluno: " + student.Name} ({"Responsável: " + student.Responsible})
                                     </Accordion.Header>
                                     <Accordion.Body>
                                         {loadingParcelas[student.Registration] ? (
@@ -178,6 +178,7 @@ function DetalheEvento() {
                                                                 <td>
                                                                     <Form.Check
                                                                         type="checkbox"
+                                                                        label={index + 1 + "ª parcela"} 
                                                                         checked={parcela.Paid || parcela.paid}
                                                                         disabled={parcela.Paid}
                                                                         onChange={() => handleCheckboxChange(student.Registration, index)}
