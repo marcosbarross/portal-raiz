@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar, Nav, Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { Nav, Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import CustomNavbar from '../components/CustomNavbar';
 import './Home.css';
@@ -27,6 +27,7 @@ function Home() {
               </Card.Body>
             </Card>
           </Col>
+
           <Col md={6} lg={4} className="mb-4">
             <Card>
               <Card.Img 
@@ -44,6 +45,7 @@ function Home() {
               </Card.Body>
             </Card>
           </Col>
+
           <Col md={6} lg={4} className="mb-4">
             <Card>
               <Card.Img 
@@ -55,6 +57,24 @@ function Home() {
                 <Card.Title>Financeiro de eventos</Card.Title>
                 <Button variant="primary">
                   <LinkContainer to={"/NovoFinanceiro"}>
+                    <Nav.Link>Abrir</Nav.Link>
+                  </LinkContainer>
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+
+          <Col md={6} lg={4} className="mb-4">
+            <Card>
+              <Card.Img 
+                variant="top" 
+                src={require('./aluna.png')} 
+                className="card-img-limited"
+              />
+              <Card.Body className="text-center">
+                <Card.Title>Painel de alunos</Card.Title>
+                <Button variant="primary">
+                  <LinkContainer to={"/AddAlunos"}>
                     <Nav.Link>Abrir</Nav.Link>
                   </LinkContainer>
                 </Button>

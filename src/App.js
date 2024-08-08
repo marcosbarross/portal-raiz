@@ -7,6 +7,8 @@ import RelatorioVendas from './pagesVendas/RelatorioVendas';
 import GeradorRecibos from './geradorRecibos/GeradorRecibos'
 import NovoFinanceiro from './financeiro/NovoFinanceiro';
 import DetalheEvento from './financeiro/DetalheEvento';
+import AddAlunos from './alunosPages/AddAlunos';
+
 const App = () => {
     return (
         <Router>
@@ -17,7 +19,8 @@ const App = () => {
                 <Route path='/relatorio'element={<RelatorioVendas/>} />
                 <Route path='/geradorRecibos' element={<GeradorRecibos />} />
                 <Route path='/novoFinanceiro' element={<NovoFinanceiro />}/>
-                <Route path='/DetalheEvento/:id' element={<DetalheEvento/>}/>
+                <Route path='/DetalheEvento/:id' element={<DetalheEvento />}/>
+                <Route path='/AddAlunos' element={<AddAlunos />} />    
             </Routes>
         </Router>
     );
