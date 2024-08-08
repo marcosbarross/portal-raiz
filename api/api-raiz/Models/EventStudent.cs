@@ -11,6 +11,9 @@ namespace api_raiz.Models
         [Required]
         public int EventId { get; set; }
 
+        [Required]
+        public int PaidInstallments { get; set; }
+
         [ForeignKey("EventId")]
         public Event Event { get; set; }
 

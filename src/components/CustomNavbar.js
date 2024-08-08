@@ -20,9 +20,6 @@ function CustomNavbar() {
               <LinkContainer to="/vendas">
                 <NavDropdown.Item>Vender</NavDropdown.Item>
               </LinkContainer>
-              <LinkContainer to="/pedidos">
-                <NavDropdown.Item>Pedidos</NavDropdown.Item>
-              </LinkContainer>
               <LinkContainer to="/relatorio">
                 <NavDropdown.Item>Relatorio</NavDropdown.Item>
               </LinkContainer>

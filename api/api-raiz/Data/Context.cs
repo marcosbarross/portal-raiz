@@ -20,7 +20,6 @@ namespace api_raiz.Data
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
             optionsBuilder.UseNpgsql(connectionString);
-            
             //optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=portal_raiz;Username=postgres;Password=root;");
         }
         

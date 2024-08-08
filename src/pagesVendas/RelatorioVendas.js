@@ -10,8 +10,10 @@ function RelatorioVendas() {
   const carregarProdutos = useCallback(() => {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
-        if (response.data && response.data.$values) {
-          setProdutos(response.data.$values);
+        if (response.data && response.data.Products && response.data.Products.$values) {
+          const produtosNormais = response.data.Products.$values;
+          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values : [];
+          setProdutos([...produtosNormais, ...produtosAlternativos]);
         } else {
           console.error('API response is not in expected format:', response.data);
           setProdutos([]);
@@ -38,6 +40,7 @@ function RelatorioVendas() {
             <tr>
               <th>Produto</th>
               <th>Tamanho</th>
+              <th>Estoque</th>
               <th>Quantidade Vendida</th>
               <th>Total Vendido</th>
             </tr>
@@ -47,6 +50,7 @@ function RelatorioVendas() {
               <tr key={produto.Id}>
                 <td>{produto.Name}</td>
                 <td>{produto.Size}</td>
+                <td>{produto.RemainingAmount}</td>
                 <td>{produto.SoldAmount}</td>
                 <td>R$ {(produto.SoldAmount * produto.Price).toFixed(2)}</td>
               </tr>

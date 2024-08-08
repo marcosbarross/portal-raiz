@@ -18,8 +18,12 @@ function Vendas() {
   useEffect(() => {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
-        if (response.data && response.data.$values) {
-          setProdutos(response.data.$values);
+        if (response.data) {
+          const allProducts = [
+            ...(response.data.Products?.$values || []),
+            ...(response.data.ProductsAlternativeSize?.$values || [])
+          ];
+          setProdutos(allProducts);
         } else {
           console.error('API response is not in expected format:', response.data);
           setProdutos([]);
@@ -93,7 +97,7 @@ function Vendas() {
     }));
 
     if (valorPago >= totalPedido) {
-      axios.post(`${getApiUrl()}/api/Product/SellProduct`, order)
+      axios.post(`${getApiUrl()}/Product/SellProduct`, order)
         .then(response => {
           setItensPedido([]);
           alert('Pedido realizado com sucesso!');
@@ -192,7 +196,7 @@ function Vendas() {
           </Form.Group>
           <Button type="submit" className="mt-3">Adicionar ao pedido</Button>
         </Form>
-        <h2 className="mt-5">Itens do Pedido</h2>
+        <h2 className="mt-5">Itens do pedido</h2>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -223,31 +227,25 @@ function Vendas() {
           <Col md={4}>
             <Form.Group>
               <Form.Label>Valor Pago</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Valor Pago"
-                value={valorPago}
-                onChange={handleValorPagoChange}
-                onBlur={calcularTroco}
-                required
-                disabled={semTroco}
-              />
+              <Form.Control type="number" value={valorPago} onChange={handleValorPagoChange} disabled={semTroco} required />
             </Form.Group>
           </Col>
+          <Col md={4} className="d-flex align-items-center">
+            <Form.Check type="checkbox" label="Sem troco" checked={semTroco} onChange={handleCheckboxChange} />
+          </Col>
           <Col md={4}>
-            <Form.Group className="mt-4">
-              <Form.Check
-                type="checkbox"
-                label="Sem troco"
-                checked={semTroco}
-                onChange={handleCheckboxChange}
-              />
+            <Form.Group>
+              <Form.Label>Troco</Form.Label>
+              <Form.Control type="number" value={troco} disabled />
             </Form.Group>
           </Col>
         </Row>
-        <h4 className="mt-4">Total: {totalPedido.toFixed(2)}</h4>
-        <h4 className="mt-2">Troco: {troco.toFixed(2)}</h4>
-        <Button className="mt-3" onClick={handleSubmitPedido}>Finalizar Pedido</Button>
+        <Row className="mt-3">
+          <Col>
+            <h3>Total: {totalPedido.toFixed(2)}</h3>
+            <Button onClick={handleSubmitPedido} disabled={itensPedido.length === 0}>Finalizar Pedido</Button>
+          </Col>
+        </Row>
       </Container>
     </>
   );

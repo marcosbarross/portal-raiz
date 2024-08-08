@@ -1,6 +1,8 @@
-﻿using api_raiz.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using api_raiz.Data;
 using api_raiz.Models;
-using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace api_raiz.Controllers
 {
@@ -15,6 +17,17 @@ namespace api_raiz.Controllers
             {
                 var students = context.Students.ToList();
                 return Ok(students);
+            }
+        }
+
+        [HttpPost("AddStudent")]
+        public IActionResult AddStudent([FromBody] Student student)
+        {
+            using (var context = new Context())
+            {
+                context.Students.Add(student);
+                context.SaveChanges();
+                return Ok();
             }
         }
 
@@ -40,8 +53,9 @@ namespace api_raiz.Controllers
                     studentEventDto.Registration = existingStudent.Registration;
                 }
 
-                // Verificar se a relação aluno-evento já existe
-                var existingEventStudent = context.EventStudents.FirstOrDefault(es => es.EventId == studentEventDto.EventId && es.StudentId == studentEventDto.Registration);
+                var existingEventStudent = context.EventStudents
+                    .FirstOrDefault(es => es.EventId == studentEventDto.EventId && es.StudentId == studentEventDto.Registration);
+
                 if (existingEventStudent != null)
                 {
                     return Conflict(new { message = "Aluno já registrado no evento." });
@@ -60,5 +74,65 @@ namespace api_raiz.Controllers
             }
         }
 
+        [HttpGet("GetStudentParcelas/{studentId}")]
+        public IActionResult GetStudentParcelas(int studentId)
+        {
+            using (var context = new Context())
+            {
+                var eventStudents = context.EventStudents
+                    .Where(es => es.StudentId == studentId)
+                    .Select(es => new InstallmentDto
+                    {
+                        EventId = es.EventId,
+                        StudentId = es.StudentId,
+                        TotalInstallments = es.Event.Installments,
+                        PaidInstallments = es.PaidInstallments
+                    })
+                    .ToList();
+
+                if (eventStudents == null || eventStudents.Count == 0)
+                {
+                    return NotFound(new { message = "Parcelas não encontradas para o aluno." });
+                }
+
+                var installments = new List<InstallmentDetailDto>();
+                foreach (var eventStudent in eventStudents)
+                {
+                    for (int i = 1; i <= eventStudent.TotalInstallments; i++)
+                    {
+                        installments.Add(new InstallmentDetailDto
+                        {
+                            InstallmentNumber = i,
+                            Paid = i <= eventStudent.PaidInstallments,
+                            EventId = eventStudent.EventId,
+                            StudentId = eventStudent.StudentId
+                        });
+                    }
+                }
+
+                return Ok(installments);
+            }
+        }
+
+        [HttpPost("PagarParcelas")]
+        public IActionResult PagarParcelas([FromBody] List<InstallmentDetailDto> installmentDetails)
+        {
+            using (var context = new Context())
+            {
+                foreach (var installment in installmentDetails)
+                {
+                    var eventStudent = context.EventStudents
+                        .FirstOrDefault(es => es.EventId == installment.EventId && es.StudentId == installment.StudentId);
+
+                    if (eventStudent != null)
+                    {
+                        eventStudent.PaidInstallments = installment.InstallmentNumber;
+                    }
+                }
+
+                context.SaveChanges();
+                return Ok(new { message = "Parcelas pagas com sucesso." });
+            }
+        }
     }
 }

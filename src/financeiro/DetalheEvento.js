@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CustomNavbar from '../components/CustomNavbar';
-import { Container, Button, Form, Spinner, Table } from "react-bootstrap";
+import { Container, Button, Form, Spinner, Table, Accordion } from "react-bootstrap";
 import axios from 'axios';
 import getApiUrl from '../util/api';
 
@@ -13,6 +13,8 @@ function DetalheEvento() {
         Name: '',
         Responsible: ''
     });
+    const [loadingParcelas, setLoadingParcelas] = useState({});
+    const [parcelas, setParcelas] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -62,10 +64,48 @@ function DetalheEvento() {
             alert('Erro ao adicionar aluno. Verifique se o aluno já está registrado no evento.');
         }
     };
-    
 
-    const handleNavigateToFinanceiro = (studentId) => {
-        navigate(`/financeiro/${studentId}`);
+    const fetchParcelas = async (studentId) => {
+        setLoadingParcelas({ ...loadingParcelas, [studentId]: true });
+        try {
+            const response = await axios.get(`${getApiUrl()}/student/GetStudentParcelas/${studentId}`);
+            setParcelas({ ...parcelas, [studentId]: response.data?.$values || [] });
+        } catch (error) {
+            console.error('Erro ao carregar parcelas do aluno:', error);
+            setParcelas({ ...parcelas, [studentId]: [] });
+        } finally {
+            setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
+        }
+    };
+
+    const handleCheckboxChange = (studentId, parcelaIndex) => {
+        const updatedParcelas = { ...parcelas };
+        if (Array.isArray(updatedParcelas[studentId])) {
+            const parcela = updatedParcelas[studentId][parcelaIndex];
+            if (!parcela.Paid) {
+                parcela.paid = !parcela.paid;
+            }
+            setParcelas(updatedParcelas);
+        } else {
+            console.error('Parcelas não é um array:', updatedParcelas[studentId]);
+        }
+    };
+
+    const handlePagarParcelas = async (studentId) => {
+        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid);
+        try {
+            await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
+            fetchParcelas(studentId);
+        } catch (error) {
+            console.error('Erro ao pagar parcelas:', error);
+            alert('Erro ao pagar parcelas.');
+        }
+    };
+
+    const handleToggleAccordion = (studentId) => {
+        if (!parcelas[studentId]) {
+            fetchParcelas(studentId);
+        }
     };
 
     return (
@@ -111,30 +151,52 @@ function DetalheEvento() {
                         )}
 
                         <h3>Alunos confirmados</h3>
-                        <Table striped className="mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Registro</th>
-                                    <th>Nome</th>
-                                    <th>Responsável</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {event.Students.map(student => (
-                                    <tr key={student.Registration}>
-                                        <td>{student.Registration}</td>
-                                        <td>{student.Name}</td>
-                                        <td>{student.Responsible}</td>
-                                        <td>
-                                            <Button variant="info" onClick={() => handleNavigateToFinanceiro(student.Registration)}>
-                                                Financeiro
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                        <Accordion defaultActiveKey="0">
+                            {event.Students.map(student => (
+                                <Accordion.Item eventKey={student.Registration.toString()} key={student.Registration}>
+                                    <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
+                                        {"Aluno: " + student.Name} ({"Responsável: " + student.Responsible})
+                                    </Accordion.Header>
+                                    <Accordion.Body>
+                                        {loadingParcelas[student.Registration] ? (
+                                            <Spinner animation="border" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </Spinner>
+                                        ) : (
+                                            <>
+                                                <Table striped className="mt-3">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Pago</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {Array.isArray(parcelas[student.Registration]) && parcelas[student.Registration].map((parcela, index) => (
+                                                            <tr key={index}>
+                                                                <td>{parcela.InstallmentNumber}</td>
+                                                                <td>
+                                                                    <Form.Check
+                                                                        type="checkbox"
+                                                                        label={index + 1 + "ª parcela"} 
+                                                                        checked={parcela.Paid || parcela.paid}
+                                                                        disabled={parcela.Paid}
+                                                                        onChange={() => handleCheckboxChange(student.Registration, index)}
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </Table>
+                                                <Button variant="success" onClick={() => handlePagarParcelas(student.Registration)}>
+                                                    Pagar Parcelas
+                                                </Button>
+                                            </>
+                                        )}
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
+                        </Accordion>
                     </>
                 ) : (
                     <Spinner animation="border" role="status">

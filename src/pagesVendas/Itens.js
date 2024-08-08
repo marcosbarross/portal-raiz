@@ -18,8 +18,10 @@ function Itens() {
   const loadProdutos = () => {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
-        if (response.data && response.data.$values) {
-          setProdutos(response.data.$values);
+        if (response.data && response.data.Products && response.data.Products.$values) {
+          const produtosNormais = response.data.Products.$values;
+          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values : [];
+          setProdutos([...produtosNormais, ...produtosAlternativos]);
         } else {
           console.error('API response is not in expected format:', response.data);
           setProdutos([]);
