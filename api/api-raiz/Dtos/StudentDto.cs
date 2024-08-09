@@ -7,6 +7,7 @@ public class StudentDto
     public string Name { get; set; }
     
     public string Responsible { get; set; }
+    public int GroupId { get; set; }
     
     public StudentDto(){}
     public StudentDto(string name, string responsible)
