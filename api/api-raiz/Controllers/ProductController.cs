@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_raiz.Data;
 using api_raiz.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace api_raiz.Controllers
 {
