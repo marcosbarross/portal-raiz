@@ -8,6 +8,8 @@ import GeradorRecibos from './geradorRecibos/GeradorRecibos'
 import NovoFinanceiro from './financeiro/NovoFinanceiro';
 import DetalheEvento from './financeiro/DetalheEvento';
 import AddAlunos from './alunosPages/AddAlunos';
+import Turmas from './turmasPages/turmas';
+import TurmaDetalhe from './turmasPages/TurmaDetalhe';
 
 const App = () => {
     return (
@@ -20,7 +22,9 @@ const App = () => {
                 <Route path='/geradorRecibos' element={<GeradorRecibos />} />
                 <Route path='/novoFinanceiro' element={<NovoFinanceiro />}/>
                 <Route path='/DetalheEvento/:id' element={<DetalheEvento />}/>
-                <Route path='/AddAlunos' element={<AddAlunos />} />    
+                <Route path='/AddAlunos' element={<AddAlunos />} />  
+                <Route path='/Turmas' element={<Turmas />} />  
+                <Route path='/TurmaDetalhe' element={<TurmaDetalhe />} />
             </Routes>
         </Router>
     );

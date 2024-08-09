@@ -21,10 +21,23 @@ namespace api_raiz.Controllers
         }
 
         [HttpPost("AddStudent")]
-        public IActionResult AddStudent([FromBody] Student student)
+        public IActionResult AddStudent([FromBody] StudentDto studentDto)
         {
             using (var context = new Context())
             {
+                var group = context.Groups.Find(studentDto.GroupId);
+                if (group == null)
+                {
+                    return BadRequest(new { message = "Grupo não encontrado." });
+                }
+
+                var student = new Student
+                {
+                    Name = studentDto.Name,
+                    Responsible = studentDto.Responsible,
+                    GroupId = studentDto.GroupId
+                };
+
                 context.Students.Add(student);
                 context.SaveChanges();
                 return Ok();
