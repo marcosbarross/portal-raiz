@@ -24,7 +24,7 @@ const App = () => {
                 <Route path='/DetalheEvento/:id' element={<DetalheEvento />}/>
                 <Route path='/AddAlunos' element={<AddAlunos />} />  
                 <Route path='/Turmas' element={<Turmas />} />  
-                <Route path='/TurmaDetalhe' element={<TurmaDetalhe />} />
+                <Route path='/TurmaDetalhe/:id' element={<TurmaDetalhe />} />
             </Routes>
         </Router>
     );

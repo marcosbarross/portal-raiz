@@ -49,13 +49,16 @@ namespace api_raiz.Controllers
         {
             using (var context = new Context())
             {
-                var existingStudent = context.Students.FirstOrDefault(s => s.Registration == studentEventDto.Registration);
+                var existingStudent = context.Students
+                    .FirstOrDefault(s => s.Registration == studentEventDto.Registration && s.GroupId == studentEventDto.GroupId);
+
                 if (existingStudent == null)
                 {
                     var student = new Student
                     {
                         Name = studentEventDto.Name,
-                        Responsible = studentEventDto.Responsible
+                        Responsible = studentEventDto.Responsible,
+                        GroupId = studentEventDto.GroupId
                     };
                     context.Students.Add(student);
                     context.SaveChanges();
@@ -86,7 +89,7 @@ namespace api_raiz.Controllers
                 return Ok();
             }
         }
-
+        
         [HttpGet("GetStudentParcelas/{studentId}")]
         public IActionResult GetStudentParcelas(int studentId)
         {
