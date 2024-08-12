@@ -54,6 +54,7 @@ namespace api_raiz.Controllers
                     Name = evento.Name,
                     Installments = evento.Installments,
                     Date = evento.Date,
+                    TotalPrice = evento.TotalPrice,
                     Students = evento.EventStudents.Select(es => new StudentDto
                     {
                         Registration = es.Student.Registration,

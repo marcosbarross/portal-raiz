@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function NovoFinanceiro() {
     const [nome, setNome] = useState('');
-    const [valor, setValor] = useState('');
+    const [totalprice, setTotalPrice] = useState('');
     const [parcelas, setParcelas] = useState('');
     const [data, setData] = useState('');
     const [events, setEvents] = useState([]);
@@ -37,7 +37,8 @@ function NovoFinanceiro() {
         const evento = {
             name: nome,
             installments: parseInt(parcelas),
-            date: new Date(date.getTime() + date.getTimezoneOffset() * 60000)
+            date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
+            TotalPrice: parseFloat(totalprice)
         };
 
         try {
@@ -74,8 +75,8 @@ function NovoFinanceiro() {
                                 <Form.Label>Valor</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={valor}
-                                    onChange={(e) => setValor(e.target.value)}
+                                    value={totalprice}
+                                    onChange={(e) => setTotalPrice(e.target.value)}
                                 />
                             </Form.Group>
                         </Col>
@@ -112,6 +113,7 @@ function NovoFinanceiro() {
                                 <th>Nome do evento</th>
                                 <th>Data</th>
                                 <th>Parcelas</th>
+                                <th>Total</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -122,6 +124,7 @@ function NovoFinanceiro() {
                                     <td>{event.Name}</td>
                                     <td>{new Date(event.Date).toLocaleDateString()}</td>
                                     <td>{event.Installments}</td>
+                                    <td>{event.TotalPrice}</td>
                                     <td>
                                         <Button variant="info" onClick={() => handleDetails(event.Id)}>
                                             Detalhes

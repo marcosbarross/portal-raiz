@@ -102,7 +102,7 @@ namespace api_raiz.Controllers
                         EventId = es.EventId,
                         StudentId = es.StudentId,
                         TotalInstallments = es.Event.Installments,
-                        PaidInstallments = es.PaidInstallments
+                        PaidInstallments = es.PaidInstallments,
                     })
                     .ToList();
 
@@ -154,5 +154,28 @@ namespace api_raiz.Controllers
             }
         }
 
+        [HttpPost("GetStudentGroupNameByStudentId")]
+        public IActionResult GetStudentGroupNameByStudentId(List<int> StudentsIds)
+        {
+            using (var context = new Context())
+            {
+                var studentGroup = new List<StudentGroupDto>();
+                foreach (var studentId in StudentsIds)
+                {
+                    var studentDto = context.Students.Find(studentId);
+                    if (studentDto != null)
+                    {
+                        var student = new StudentGroupDto(studentDto);
+                        var group = context.Groups.Find(studentDto.GroupId);
+                        if (group != null)
+                        {
+                            student.GroupName = group.name;
+                            studentGroup.Add(student);
+                        }
+                    }
+                }
+                return Ok(studentGroup);
+            }
+        }
     }
 }

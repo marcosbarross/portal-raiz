@@ -9,9 +9,13 @@ function DetalheEvento() {
     const { id } = useParams();
     const [event, setEvent] = useState(null);
     const [showAddStudentForm, setShowAddStudentForm] = useState(false);
+    const [levels, setLevels] = useState([]);
+    const [groups, setGroups] = useState([]);
+    const [students, setStudents] = useState([]);
     const [newStudent, setNewStudent] = useState({
-        Name: '',
-        Responsible: ''
+        Level: '',
+        GroupId: '',
+        Registration: ''
     });
     const [loadingParcelas, setLoadingParcelas] = useState({});
     const [parcelas, setParcelas] = useState({});
@@ -19,6 +23,7 @@ function DetalheEvento() {
 
     useEffect(() => {
         fetchEventDetails();
+        fetchLevels();
     }, [id]);
 
     const fetchEventDetails = async () => {
@@ -32,17 +37,64 @@ function DetalheEvento() {
         }
     };
 
-    const handleNavigateToNewScreen = () => {
-        navigate(`/nova-tela/${id}`);
+    const fetchLevels = async () => {
+        try {
+            const response = await axios.get(`${getApiUrl()}/group/GetGroups`);
+            const groupsData = response.data;
+            const groupsArray = groupsData.$values || [];
+            const uniqueLevels = [...new Set(groupsArray.map(group => group.level))];
+            setLevels(uniqueLevels);
+        } catch (error) {
+            console.error('Erro ao carregar níveis:', error);
+        }
+    };
+
+    const fetchGroupsByLevel = async (level) => {
+        try {
+            const response = await axios.get(`${getApiUrl()}/group/GetGroups`);
+            const groupsData = response.data;
+            const groupsArray = groupsData.$values || [];
+            const filteredGroups = groupsArray.filter(group => group.level === level);
+            setGroups(filteredGroups);
+        } catch (error) {
+            console.error('Erro ao carregar turmas:', error);
+        }
+    };
+
+    const fetchStudentsByGroup = async (groupId) => {
+        try {
+            const response = await axios.get(`${getApiUrl()}/student/GetStudents`);
+            const studentsData = response.data?.$values || [];
+            const filteredStudents = studentsData.filter(student => student.GroupId == groupId);
+            setStudents(filteredStudents);
+        } catch (error) {
+            console.error('Erro ao carregar alunos:', error);
+        }
+    };
+    
+
+    const handleLevelChange = (e) => {
+        const level = e.target.value;
+        setNewStudent({ ...newStudent, Level: level, GroupId: '', Registration: '' });
+        setGroups([]);
+        setStudents([]);
+        fetchGroupsByLevel(level);
+    };
+
+    const handleGroupChange = (e) => {
+        const groupId = e.target.value;
+        setNewStudent({ ...newStudent, GroupId: groupId, Registration: '' });
+        setStudents([]);
+        fetchStudentsByGroup(groupId);
+    };
+
+    const handleStudentChange = (e) => {
+        const registration = e.target.value;
+        setNewStudent({ ...newStudent, Registration: registration });
     };
 
     const handleAddStudentToggle = () => {
         setShowAddStudentForm(!showAddStudentForm);
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewStudent({ ...newStudent, [name]: value });
     };
 
     const handleAddStudent = async (e) => {
@@ -50,11 +102,12 @@ function DetalheEvento() {
         try {
             await axios.post(`${getApiUrl()}/student/AddStudentToEvent`, {
                 EventId: id,
-                ...newStudent
+                Registration: newStudent.Registration
             });
             setNewStudent({
-                Name: '',
-                Responsible: ''
+                Level: '',
+                GroupId: '',
+                Registration: ''
             });
             setShowAddStudentForm(false);
             fetchEventDetails();
@@ -63,7 +116,6 @@ function DetalheEvento() {
             alert('Erro ao adicionar aluno. Verifique se o aluno já está registrado no evento.');
         }
     };
-    
 
     const fetchParcelas = async (studentId) => {
         setLoadingParcelas({ ...loadingParcelas, [studentId]: true });
@@ -77,13 +129,12 @@ function DetalheEvento() {
             setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
         }
     };
+
     const handleCheckboxChange = (studentId, parcelaIndex) => {
         const updatedParcelas = { ...parcelas };
         if (Array.isArray(updatedParcelas[studentId])) {
             const selectedParcela = updatedParcelas[studentId][parcelaIndex];
-    
             const allPreviousPaid = updatedParcelas[studentId].slice(0, parcelaIndex).every(parcela => parcela.Paid || parcela.paid);
-    
             if (allPreviousPaid) {
                 if (!selectedParcela.Paid) {
                     selectedParcela.paid = !selectedParcela.paid;
@@ -91,14 +142,11 @@ function DetalheEvento() {
                 setParcelas(updatedParcelas);
             } else {
                 alert('Você só pode pagar parcelas consecutivas.');
-                window.location.reload();
-            }            
+            }
         } else {
             console.error('Parcelas não é um array:', updatedParcelas[studentId]);
         }
-    };    
-
-    
+    };
 
     const handlePagarParcelas = async (studentId) => {
         const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid).map(parcela => ({
@@ -107,7 +155,6 @@ function DetalheEvento() {
             EventId: id,
             StudentId: studentId
         }));
-    
         try {
             await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
             fetchParcelas(studentId);
@@ -116,8 +163,6 @@ function DetalheEvento() {
             alert('Erro ao pagar parcelas.');
         }
     };
-    
-    
 
     const handleToggleAccordion = (studentId) => {
         if (!parcelas[studentId]) {
@@ -133,92 +178,116 @@ function DetalheEvento() {
                     <>
                         <h1>{event.Name}</h1>
                         <p>Data: {new Date(event.Date).toLocaleDateString()}</p>
-                        <p>Parcelas: {event.Installments}</p>
+                        <p>Pagamento: R${event.TotalPrice} reais em {event.Installments} parcelas de R$ {event.TotalPrice / event.Installments}</p>
 
                         <Button variant="primary" onClick={handleAddStudentToggle}>
                             {showAddStudentForm ? 'Cancelar' : 'Adicionar Aluno'}
                         </Button>
+                        <br />
 
                         {showAddStudentForm && (
-                            <Form onSubmit={handleAddStudent} className="mt-3">
-                                <Form.Group>
-                                    <Form.Label>Nome</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="Name"
-                                        value={newStudent.Name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                                <Form.Group>
-                                    <Form.Label>Responsável</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="Responsible"
-                                        value={newStudent.Responsible}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                                <Button type="submit" variant="success" className="mt-3">
-                                    Adicionar
-                                </Button>
-                            </Form>
+                            <Container className="mb-3">
+                                <Form onSubmit={handleAddStudent} className="mt-4">
+                                    <Form.Group controlId="formLevel">
+                                        <Form.Label>Nível</Form.Label>
+                                        <Form.Select aria-label="Selecione o nível" value={newStudent.Level} onChange={handleLevelChange}>
+                                            <option value="">Selecione o nível</option>
+                                            {levels.map((level) => (
+                                                <option key={level} value={level}>{level}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <br />
+
+                                    <Form.Group controlId="formGroup">
+                                        <Form.Label>Turma</Form.Label>
+                                        <Form.Select 
+                                            aria-label="Selecione a turma"
+                                            value={newStudent.GroupId}
+                                            onChange={handleGroupChange}
+                                            disabled={!newStudent.Level}
+                                        >
+                                            <option value="">Selecione a turma</option>
+                                            {groups.map((group) => (
+                                                <option key={group.id} value={group.id}>{group.name} {group.shift} </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <br />
+                                    <Form.Group controlId="formStudent">
+                                        <Form.Label>Aluno</Form.Label>
+                                        <Form.Select 
+                                            aria-label="Selecione o aluno"
+                                            value={newStudent.Registration}
+                                            onChange={handleStudentChange}
+                                            disabled={!newStudent.GroupId}
+                                        >
+                                            <option value="">Selecione o aluno</option>
+                                            {students.map((student) => (
+                                                <option key={student.Registration} value={student.Registration}>
+                                                    {student.Name} (Responsável: {student.Responsible})
+
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <Button type="submit" variant="success" className="mt-3">
+                                        Adicionar
+                                    </Button>
+                                </Form>
+                            </Container>
                         )}
 
+                        <br />
                         <h3>Alunos confirmados</h3>
                         <Accordion defaultActiveKey="0">
                             {event.Students.map(student => (
-                                <Accordion.Item eventKey={student.Registration.toString()} key={student.Registration}>
+                                <Accordion.Item eventKey={student.Registration} key={student.Registration}>
                                     <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
-                                        {"Aluno: " + student.Name} ({"Responsável: " + student.Responsible})
+                                        {`${student.Name}, Responsável: (${student.Responsible})` }
                                     </Accordion.Header>
                                     <Accordion.Body>
                                         {loadingParcelas[student.Registration] ? (
-                                            <Spinner animation="border" role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </Spinner>
+                                            <Spinner animation="border" />
                                         ) : (
-                                            <>
-                                                <Table striped className="mt-3">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Pago</th>
+                                            <Table striped bordered hover>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Parcela</th>
+                                                        <th>Pago</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {parcelas[student.Registration]?.map((parcela, index) => (
+                                                        <tr key={parcela.InstallmentNumber}>
+                                                            <td>Parcela {parcela.InstallmentNumber}</td>
+                                                            <td>
+                                                                <Form.Check
+                                                                    type="checkbox"
+                                                                    checked={parcela.paid || parcela.Paid}
+                                                                    disabled={parcela.Paid}
+                                                                    onChange={() => handleCheckboxChange(student.Registration, index)}
+                                                                />
+                                                            </td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {Array.isArray(parcelas[student.Registration]) && parcelas[student.Registration].map((parcela, index) => (
-                                                            <tr key={index}>
-                                                                <td>{parcela.InstallmentNumber}</td>
-                                                                <td>
-                                                                    <Form.Check
-                                                                        type="checkbox"
-                                                                        label={index + 1 + "ª parcela"} 
-                                                                        checked={parcela.Paid || parcela.paid}
-                                                                        disabled={parcela.Paid}
-                                                                        onChange={() => handleCheckboxChange(student.Registration, index)}
-                                                                    />
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </Table>
-                                                <Button variant="success" onClick={() => handlePagarParcelas(student.Registration)}>
-                                                    Pagar Parcelas
-                                                </Button>
-                                            </>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
                                         )}
+                                        <Button 
+                                            variant="success"
+                                            onClick={() => handlePagarParcelas(student.Registration)}
+                                            disabled={loadingParcelas[student.Registration]}
+                                        >
+                                            Pagar parcelas
+                                        </Button>
                                     </Accordion.Body>
                                 </Accordion.Item>
                             ))}
                         </Accordion>
                     </>
                 ) : (
-                    <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </Spinner>
+                    <Spinner animation="border" />
                 )}
             </Container>
         </>
