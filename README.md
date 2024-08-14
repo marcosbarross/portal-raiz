@@ -1,70 +1,62 @@
-# Getting Started with Create React App
+<h1>Portal Raiz (Poruguês)</h1>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<p>
+Esse sistema está sendo desenvolvido em módulos com front-end em React.JS com Bootstrap através da biblioteca React Bootstrap e Back-end em C# com ASP.NET, PostgreSQL e Docker.
+</p>
 
-## Available Scripts
 
-In the project directory, you can run:
+<h3>Módulos</h3>
+A prícipio esse sistema é constituido por 5 módulos:
 
-### `npm start`
+<h4>Módulo de recibos genéricos:</h4>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<p>Esse módulo foi importado de um projeto pessoal de minha própria autoria disponível em: https://github.com/marcosbarross/Recibos. <br>
+Esse módulo permite ao usuário gerar recibos para produtos genéricos vendidos na secretária ou emitir recibos de forma rápida através da impressora térmica TM-T20.</p>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<h4>Módulo de vendas de produto:</h4>
 
-### `npm test`
+<p>Esse módulo é uma adaptação de outro repositório (https://github.com/marcosbarross/caixa-react) inicialmente criado para ser usado numa cantina de uma festa de São João e que sofreu algumas adaptações para vender e contralar um estoque de uniformes.</p>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<h4>Módulo financeiro de eventos</h4>
 
-### `npm run build`
+<p>Esse módulo original deste projeto foi criado para gerenciar pagamentos de alunos em eventos pagos da escola.</p>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Módulo Painel de Alunos
+Este módulo é responsável pelo cadastro de novos alunos em turmas já existentes, facilitando a gestão de alunos dentro do sistema evitando duplicidades.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Módulo de Cadastro de Turmas
+Este módulo permite o cadastro de novas turmas no sistema, complementando a estrutura de gerenciamento de alunos e eventos.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<h1>Portal Raiz (English)</h1>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Disclaimer: the system only work in portuguese at this time.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+<p>
+This system is being developed in modules with a front-end in React.JS with Bootstrap through the React Bootstrap library, and a back-end in C# with ASP.NET, PostgreSQL, and Docker.
+</p>
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<h3>Modules</h3>
+Initially, the system consists of 5 modules:
 
-## Learn More
+<h4>Generic Receipts Module:</h4>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+<p>This module was imported from a personal project of mine available at: <a href="https://github.com/marcosbarross/Recibos">https://github.com/marcosbarross/Recibos</a>. <br>
+This module allows users to generate receipts for generic products sold at the secretary or issue receipts quickly through the TM-T20 thermal printer.</p>
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<h4>Product Sales Module:</h4>
 
-### Code Splitting
+<p>This module is an adaptation of another repository (<a href="https://github.com/marcosbarross/caixa-react">https://github.com/marcosbarross/caixa-react</a>) originally created for use at a São João festival canteen and has been adapted to sell and manage a uniform inventory.</p>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+<h4>Event Financial Module:</h4>
 
-### Analyzing the Bundle Size
+<p>This original module of the project was created to manage payments of students for paid school events.</p>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+<h4>Student Panel Module:</h4>
 
-### Making a Progressive Web App
+<p>This module is responsible for registering new students in existing classes, facilitating student management within the system and avoiding duplications.</p>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+<h4>Class Registration Module:</h4>
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<p>This module allows the registration of new classes in the system, complementing the structure of student and event management.</p>
