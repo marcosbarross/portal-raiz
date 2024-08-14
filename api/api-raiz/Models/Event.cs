@@ -17,16 +17,20 @@ namespace api_raiz.Models
 
         [Required]
         public DateTime Date { get; set; }
+        
+        [Required]
+        public Double TotalPrice { get; set; }
 
         public ICollection<EventStudent> EventStudents { get; set; } = new List<EventStudent>();
 
         public Event() { }
 
-        public Event(string name, int installments, DateTime date)
+        public Event(string name, int installments, DateTime date, Double totalPrice)
         {
             Name = name;
             Installments = installments;
             Date = date;
+            TotalPrice = totalPrice;
         }
     }
 }

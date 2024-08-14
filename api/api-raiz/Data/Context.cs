@@ -7,6 +7,7 @@ namespace api_raiz.Data
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Group> Groups { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
 
@@ -20,6 +21,7 @@ namespace api_raiz.Data
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
             optionsBuilder.UseNpgsql(connectionString);
+            
             //optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=portal_raiz;Username=postgres;Password=root;");
         }
         
@@ -39,7 +41,13 @@ namespace api_raiz.Data
                 .HasOne(es => es.Student)
                 .WithMany(s => s.EventStudents)
                 .HasForeignKey(es => es.StudentId);
+            
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Group)
+                .WithMany(g => g.Students)
+                .HasForeignKey(s => s.GroupId);
         }
+
 
         public Context() { }
     }

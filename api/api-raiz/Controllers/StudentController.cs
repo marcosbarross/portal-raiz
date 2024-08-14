@@ -21,10 +21,23 @@ namespace api_raiz.Controllers
         }
 
         [HttpPost("AddStudent")]
-        public IActionResult AddStudent([FromBody] Student student)
+        public IActionResult AddStudent([FromBody] StudentDto studentDto)
         {
             using (var context = new Context())
             {
+                var group = context.Groups.Find(studentDto.GroupId);
+                if (group == null)
+                {
+                    return BadRequest(new { message = "Grupo não encontrado." });
+                }
+
+                var student = new Student
+                {
+                    Name = studentDto.Name,
+                    Responsible = studentDto.Responsible,
+                    GroupId = studentDto.GroupId
+                };
+
                 context.Students.Add(student);
                 context.SaveChanges();
                 return Ok();
@@ -36,13 +49,16 @@ namespace api_raiz.Controllers
         {
             using (var context = new Context())
             {
-                var existingStudent = context.Students.FirstOrDefault(s => s.Registration == studentEventDto.Registration);
+                var existingStudent = context.Students
+                    .FirstOrDefault(s => s.Registration == studentEventDto.Registration && s.GroupId == studentEventDto.GroupId);
+
                 if (existingStudent == null)
                 {
                     var student = new Student
                     {
                         Name = studentEventDto.Name,
-                        Responsible = studentEventDto.Responsible
+                        Responsible = studentEventDto.Responsible,
+                        GroupId = studentEventDto.GroupId
                     };
                     context.Students.Add(student);
                     context.SaveChanges();
@@ -73,7 +89,7 @@ namespace api_raiz.Controllers
                 return Ok();
             }
         }
-
+        
         [HttpGet("GetStudentParcelas/{studentId}")]
         public IActionResult GetStudentParcelas(int studentId)
         {
@@ -86,7 +102,7 @@ namespace api_raiz.Controllers
                         EventId = es.EventId,
                         StudentId = es.StudentId,
                         TotalInstallments = es.Event.Installments,
-                        PaidInstallments = es.PaidInstallments
+                        PaidInstallments = es.PaidInstallments,
                     })
                     .ToList();
 
@@ -126,12 +142,39 @@ namespace api_raiz.Controllers
 
                     if (eventStudent != null)
                     {
-                        eventStudent.PaidInstallments = installment.InstallmentNumber;
+                        if (installment.InstallmentNumber > eventStudent.PaidInstallments)
+                        {
+                            eventStudent.PaidInstallments = installment.InstallmentNumber;
+                        }
                     }
                 }
 
                 context.SaveChanges();
                 return Ok(new { message = "Parcelas pagas com sucesso." });
+            }
+        }
+
+        [HttpPost("GetStudentGroupNameByStudentId")]
+        public IActionResult GetStudentGroupNameByStudentId(List<int> StudentsIds)
+        {
+            using (var context = new Context())
+            {
+                var studentGroup = new List<StudentGroupDto>();
+                foreach (var studentId in StudentsIds)
+                {
+                    var studentDto = context.Students.Find(studentId);
+                    if (studentDto != null)
+                    {
+                        var student = new StudentGroupDto(studentDto);
+                        var group = context.Groups.Find(studentDto.GroupId);
+                        if (group != null)
+                        {
+                            student.GroupName = group.name;
+                            studentGroup.Add(student);
+                        }
+                    }
+                }
+                return Ok(studentGroup);
             }
         }
     }

@@ -6,5 +6,6 @@ public class EventDetailsDto
     public string Name { get; set; }
     public int Installments { get; set; }
     public DateTime Date { get; set; }
+    public Double TotalPrice { get; set; }
     public List<StudentDto> Students { get; set; }
 }

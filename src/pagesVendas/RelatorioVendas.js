@@ -41,8 +41,8 @@ function RelatorioVendas() {
               <th>Produto</th>
               <th>Tamanho</th>
               <th>Estoque</th>
-              <th>Quantidade Vendida</th>
-              <th>Total Vendido</th>
+              <th>Quantidade vendida</th>
+              <th>Total vendido</th>
             </tr>
           </thead>
           <tbody>

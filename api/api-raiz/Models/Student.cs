@@ -16,18 +16,22 @@ namespace api_raiz.Models
 
         [Required]
         public string Responsible { get; set; }
+        
+        public int GroupId { get; set; }
+        [ForeignKey("id")]
+        public Group Group { get; set; }
 
         public ICollection<EventStudent> EventStudents { get; set; } = new List<EventStudent>();
 
         public Student()
         {
-            
         }
-        
+
         public Student(StudentDto studentDTO)
         {
             Name = studentDTO.Name;
             Responsible = studentDTO.Responsible;
         }
     }
+
 }

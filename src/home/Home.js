@@ -81,6 +81,24 @@ function Home() {
               </Card.Body>
             </Card>
           </Col>
+
+          <Col md={6} lg={4} className="mb-4">
+            <Card>
+              <Card.Img 
+                variant="top" 
+                src={require('./encontro.png')} 
+                className="card-img-limited"
+              />
+              <Card.Body className="text-center">
+                <Card.Title>Painel de turmas</Card.Title>
+                <Button variant="primary">
+                  <LinkContainer to={"/Turmas"}>
+                    <Nav.Link>Abrir</Nav.Link>
+                  </LinkContainer>
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
         </Row>
       </Container>
     </>
