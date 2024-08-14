@@ -1,4 +1,4 @@
-<h1>Portal Raiz (Poruguês)</h1>
+<h1>Portal Raiz (Português)</h1>
 
 <p>
 Esse sistema está sendo desenvolvido em módulos com front-end em React.JS com Bootstrap através da biblioteca React Bootstrap e Back-end em C# com ASP.NET, PostgreSQL e Docker.
