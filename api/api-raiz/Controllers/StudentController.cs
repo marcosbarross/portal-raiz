@@ -49,16 +49,13 @@ namespace api_raiz.Controllers
         {
             using (var context = new Context())
             {
-                var existingStudent = context.Students
-                    .FirstOrDefault(s => s.Registration == studentEventDto.Registration && s.GroupId == studentEventDto.GroupId);
-
+                var existingStudent = context.Students.FirstOrDefault(s => s.Registration == studentEventDto.Registration);
                 if (existingStudent == null)
                 {
                     var student = new Student
                     {
                         Name = studentEventDto.Name,
-                        Responsible = studentEventDto.Responsible,
-                        GroupId = studentEventDto.GroupId
+                        Responsible = studentEventDto.Responsible
                     };
                     context.Students.Add(student);
                     context.SaveChanges();
