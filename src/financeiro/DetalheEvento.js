@@ -129,6 +129,7 @@ function DetalheEvento() {
             setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
         }
     };
+    
 
     const handleCheckboxChange = (studentId, parcelaIndex) => {
         const updatedParcelas = { ...parcelas };
@@ -168,7 +169,7 @@ function DetalheEvento() {
         if (!parcelas[studentId]) {
             fetchParcelas(studentId);
         }
-    };
+    };    
 
     return (
         <>
@@ -241,50 +242,51 @@ function DetalheEvento() {
                         <br />
                         <h3>Alunos confirmados</h3>
                         <Accordion defaultActiveKey="0">
-                            {event.Students.map(student => (
-                                <Accordion.Item eventKey={student.Registration} key={student.Registration}>
-                                    <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
-                                        {`${student.Name}, Responsável: (${student.Responsible})` }
-                                    </Accordion.Header>
-                                    <Accordion.Body>
-                                        {loadingParcelas[student.Registration] ? (
-                                            <Spinner animation="border" />
-                                        ) : (
-                                            <Table striped bordered hover>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Parcela</th>
-                                                        <th>Pago</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {parcelas[student.Registration]?.map((parcela, index) => (
-                                                        <tr key={parcela.InstallmentNumber}>
-                                                            <td>Parcela {parcela.InstallmentNumber}</td>
-                                                            <td>
-                                                                <Form.Check
-                                                                    type="checkbox"
-                                                                    checked={parcela.paid || parcela.Paid}
-                                                                    disabled={parcela.Paid}
-                                                                    onChange={() => handleCheckboxChange(student.Registration, index)}
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        )}
-                                        <Button 
-                                            variant="success"
-                                            onClick={() => handlePagarParcelas(student.Registration)}
-                                            disabled={loadingParcelas[student.Registration]}
-                                        >
-                                            Pagar parcelas
-                                        </Button>
-                                    </Accordion.Body>
-                                </Accordion.Item>
+    {event.Students.map(student => (
+        <Accordion.Item eventKey={student.Registration} key={student.Registration}>
+            <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
+                {`${student.Name}, Responsável: (${student.Responsible})` }
+            </Accordion.Header>
+            <Accordion.Body>
+                {loadingParcelas[student.Registration] ? (
+                    <Spinner animation="border" />
+                ) : (
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Parcela</th>
+                                <th>Pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {parcelas[student.Registration]?.map((parcela, index) => (
+                                <tr key={parcela.InstallmentNumber}>
+                                    <td>Parcela {parcela.InstallmentNumber}</td>
+                                    <td>
+                                        <Form.Check
+                                            type="checkbox"
+                                            checked={parcela.paid || parcela.Paid}
+                                            disabled={parcela.Paid}
+                                            onChange={() => handleCheckboxChange(student.Registration, index)}
+                                        />
+                                    </td>
+                                </tr>
                             ))}
-                        </Accordion>
+                        </tbody>
+                    </Table>
+                )}
+                <Button 
+                    variant="success"
+                    onClick={() => handlePagarParcelas(student.Registration)}
+                    disabled={loadingParcelas[student.Registration]}
+                >
+                    Pagar parcelas
+                </Button>
+            </Accordion.Body>
+        </Accordion.Item>
+    ))}
+</Accordion>
+
                     </>
                 ) : (
                     <Spinner animation="border" />
