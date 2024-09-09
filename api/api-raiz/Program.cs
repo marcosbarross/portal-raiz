@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("https://portalraiz.netlify.app/")
+        builder => builder.WithOrigins("https://portalraiz.netlify.app")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
@@ -26,13 +26,15 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// Somente use HTTPS Redirection se o ambiente for Development
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigin");
 
