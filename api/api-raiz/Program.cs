@@ -17,6 +17,10 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Registrar o contexto do banco de dados com SQLite
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -25,24 +29,16 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<Context>();
-    dbContext.Database.Migrate();
-}
-
-// Somente use HTTPS Redirection se o ambiente for Development
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
+    dbContext.Database.Migrate(); // Aplica as migrations, se necessário
 }
 
 app.UseHttpsRedirection();

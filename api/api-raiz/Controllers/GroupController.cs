@@ -1,30 +1,32 @@
-﻿using System.Text.RegularExpressions;
-using api_raiz.Data;
+﻿using api_raiz.Data;
 using api_raiz.Models;
 using Microsoft.AspNetCore.Mvc;
-using Group = api_raiz.Models.Group;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace api_raiz.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class GroupController : ControllerBase
+namespace api_raiz.Controllers
 {
-    [HttpGet("GetGroups")]
-    public IActionResult GetGroups()
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GroupController : ControllerBase
     {
-        using (var context = new Context())
-        {
-            return Ok(context.Groups.ToList());
-        }
-    }
+        private readonly Context _context;
 
-    [HttpGet("GetGroupDetail/{id}")]
-    public IActionResult GetGroupDetail(int id)
-    {
-        using (var context = new Context())
+        public GroupController(Context context)
         {
-            var group = context.Groups
+            _context = context;
+        }
+
+        [HttpGet("GetGroups")]
+        public IActionResult GetGroups()
+        {
+            return Ok(_context.Groups.ToList());
+        }
+
+        [HttpGet("GetGroupDetail/{id}")]
+        public IActionResult GetGroupDetail(int id)
+        {
+            var group = _context.Groups
                 .Where(g => g.id == id)
                 .Select(g => new GroupDetailDto
                 {
@@ -48,35 +50,26 @@ public class GroupController : ControllerBase
             }
             return Ok(group);
         }
-    }
 
-
-    
-    [HttpPost("AddGroup")]
-    public IActionResult AddGroup(Group group)
-    {
-        using (var context = new Context())
+        [HttpPost("AddGroup")]
+        public IActionResult AddGroup([FromBody] Group group)
         {
-            context.Groups.Add((group));
-            context.SaveChanges();
+            _context.Groups.Add(group);
+            _context.SaveChanges();
             return Ok();
         }
-    }
 
-    [HttpDelete("RemoveGroup")]
-    public IActionResult RemoveGroup(int id)
-    {
-        using (var context = new Context())
+        [HttpDelete("RemoveGroup/{id}")]
+        public IActionResult RemoveGroup(int id)
         {
-            var group = context.Groups.Find(id);
+            var group = _context.Groups.Find(id);
             if (group == null)
             {
                 return NotFound();
             }
-            context.Groups.Remove(group);
-            context.SaveChanges();
+            _context.Groups.Remove(group);
+            _context.SaveChanges();
             return Ok();
         }
-            
     }
 }

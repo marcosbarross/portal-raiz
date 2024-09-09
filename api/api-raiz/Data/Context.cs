@@ -5,18 +5,15 @@ namespace api_raiz.Data
 {
     public class Context : DbContext
     {
+        public Context(DbContextOptions<Context> options) : base(options) { }
+        //public Context() { }
+
         public DbSet<Product> Products { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // String de conexão para o SQLite
-            optionsBuilder.UseSqlite("Data Source=portal_raiz.db");
-        }
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -39,7 +36,5 @@ namespace api_raiz.Data
                 .WithMany(g => g.Students)
                 .HasForeignKey(s => s.GroupId);
         }
-
-        public Context() { }
     }
 }
