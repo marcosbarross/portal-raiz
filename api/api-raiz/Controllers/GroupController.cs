@@ -71,5 +71,21 @@ namespace api_raiz.Controllers
             _context.SaveChanges();
             return Ok();
         }
+
+        [HttpDelete("RemoveStudentFromGroup/{studentId}")]
+        public IActionResult RemoveStudentFromGroup(int studentId)
+        {
+            var student = _context.Students.Find((studentId));
+            if (student == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _context.Students.Remove(student);
+                _context.SaveChanges();
+            }
+            return Ok();
+        }
     }
 }
