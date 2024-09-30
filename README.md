@@ -11,7 +11,7 @@ A prícipio esse sistema é constituido por 5 módulos:
 <h4>Módulo de recibos genéricos:</h4>
 
 <p>Esse módulo foi importado de um projeto pessoal de minha própria autoria disponível em: https://github.com/marcosbarross/Recibos. <br>
-Esse módulo permite ao usuário gerar recibos para produtos genéricos vendidos na secretária ou emitir recibos de forma rápida através da impressora térmica TM-T20.</p>
+Esse módulo permite ao usuário gerar recibos para produtos genéricos vendidos na secretaria ou emitir recibos de forma rápida através da impressora térmica TM-T20.</p>
 
 <h4>Módulo de vendas de produto:</h4>
 
