@@ -73,10 +73,29 @@ public class GroupController : ControllerBase
             {
                 return NotFound();
             }
+
             context.Groups.Remove(group);
             context.SaveChanges();
             return Ok();
         }
-            
+    }
+    
+    [HttpDelete("RemoveStudentFromGroup/{studentId}")]
+    public IActionResult RemoveStudentFromGroup(int studentId)
+    {
+        using (var context = new Context())
+        {
+            var student = context.Students.Find((studentId));
+            if (student == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                context.Students.Remove(student);
+                context.SaveChanges();
+            }
+            return Ok(); 
+        }
     }
 }

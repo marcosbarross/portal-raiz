@@ -1,41 +1,48 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Table, Container } from 'react-bootstrap';
+import { Table, Container, Button } from 'react-bootstrap';
+import axios from 'axios';
 import getApiUrl from '../util/api';
 import CustomNavbar from '../components/CustomNavbar';
 
 function TurmaDetalhe() {
     const { id } = useParams();
-    console.log('ID from params:', id); // Log do ID
     const [groupData, setGroupData] = useState(null);
     const [error, setError] = useState(null);
+
+    const handleDeleteStudent = (StudentId) => {
+        axios.delete(`${getApiUrl()}/group/RemoveStudentFromGroup/${StudentId}`)
+          .then(() => loadStudents(groupData.Id))
+          .catch(error => console.error('Error deleting product:', error));
+      };
+
+    const loadStudents = (id) =>{
+        fetch(`${getApiUrl()}/group/GetGroupDetail/${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.Students && data.Students.$values) {
+                const students = data.Students.$values;
+                setGroupData({ ...data, Students: students });
+            } else {
+                setGroupData(data);
+            }
+        })
+        .catch(error => setError(error));
+    }
     
     useEffect(() => {
-        if (id) {  // Verifica se o ID existe
-            console.log('ID exists, making API call'); // Log para confirmar o ID
-            fetch(`${getApiUrl()}/group/GetGroupDetail/${id}`)
-                .then(response => {
-                    console.log('Response:', response);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data:', data); // Log dos dados recebidos
-                    if (data && data.Students && data.Students.$values) {
-                        const students = data.Students.$values;
-                        setGroupData({ ...data, Students: students });
-                    } else {
-                        setGroupData(data);
-                    }
-                })
-                .catch(error => setError(error));
+        if (id) {
+            loadStudents(id);
         }
     }, [id]);
 
     if (error) {
-        console.error('Erro:', error); // Log do erro para depuração
+        console.error('Erro:', error);
         return <p>Erro ao carregar os dados: {error.message}</p>;
     }
 
@@ -59,6 +66,7 @@ function TurmaDetalhe() {
                         <th>Nome</th>
                         <th>Responsável</th>
                         <th>Turma</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +76,9 @@ function TurmaDetalhe() {
                             <td>{student.Name}</td>
                             <td>{student.Responsible}</td>
                             <td>{groupData.Name}</td>
+                            <td>
+                            <Button variant="danger" onClick={() => handleDeleteStudent(student.Registration)}>Remover</Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
