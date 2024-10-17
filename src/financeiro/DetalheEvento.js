@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CustomNavbar from '../components/CustomNavbar';
+import jsPDF from 'jspdf';
 import { Container, Button, Form, Spinner, Table, Accordion } from "react-bootstrap";
 import axios from 'axios';
 import getApiUrl from '../util/api';
@@ -25,6 +26,70 @@ function DetalheEvento() {
         fetchEventDetails();
         fetchLevels();
     }, [id]);
+
+    const handleGerarPDF = (studentName, parcelasPagas) => {
+        const pdf = new jsPDF({
+            unit: 'mm',
+            format: [80, 297]
+        });
+    
+        const docWidth = pdf.internal.pageSize.getWidth();
+    
+        pdf.setFontSize(8);
+        pdf.text('EDUCANDÁRIO RAIZ DO SABER', docWidth / 2, 10, { align: 'center' });
+        pdf.text('Rua Francisco do Rego Moraes Barros', docWidth / 2, 13, { align: 'center' });
+        pdf.text('Engenho Maranguape - Paulista - PE', docWidth / 2, 16, { align: 'center' });
+        pdf.text('CNPJ: 03.511.401.0001-02', docWidth / 2, 19, { align: 'center' });
+    
+        pdf.setFontSize(10);
+        const currentDate = new Date().toLocaleDateString();
+        pdf.text(`Nome: ${studentName}`, 10, 25);
+        pdf.text(`Data: ${currentDate}`, 10, 30);
+        pdf.text('Descrição:', 10, 40);
+    
+        let yPos = 45;
+        let total = 0;
+    
+        parcelasPagas.forEach((parcela, index) => {
+            const descricao = ` ${parcela.InstallmentNumber}ª parcela`;
+            const preco = `R$ ${parcela.Valor}`;
+            pdf.text(descricao, 10, yPos);
+            pdf.text(preco, 50, yPos);
+            yPos += 10;
+    
+            pdf.line(10, yPos - 5, 80, yPos - 5);
+            total += parseFloat(parcela.Valor);
+        });
+    
+        pdf.text(`Total: R$ ${total.toFixed(2)}`, 10, yPos + 5);
+        yPos += 15;
+        pdf.text('Obrigado!', 10, yPos);
+    
+        const string = pdf.output('bloburl');
+        window.open(string, '_blank');
+    };
+    
+    const handlePagarParcelas = async (studentId) => {
+        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid).map(parcela => ({
+            InstallmentNumber: parcela.InstallmentNumber,
+            Paid: true,
+            Valor: event.TotalPrice / event.Installments,
+            EventId: id,
+            StudentId: studentId
+        }));
+    
+        try {
+            await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
+            fetchParcelas(studentId);
+            const student = event.Students.find(s => s.Registration === studentId);
+            console.log(selectedParcelas)
+            handleGerarPDF(student.Name, selectedParcelas);
+        } catch (error) {
+            console.error('Erro ao pagar parcelas:', error);
+            alert('Erro ao pagar parcelas.');
+        }
+    };
+    
 
     const fetchEventDetails = async () => {
         try {
@@ -146,22 +211,6 @@ function DetalheEvento() {
             }
         } else {
             console.error('Parcelas não é um array:', updatedParcelas[studentId]);
-        }
-    };
-
-    const handlePagarParcelas = async (studentId) => {
-        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid).map(parcela => ({
-            InstallmentNumber: parcela.InstallmentNumber,
-            Paid: true,
-            EventId: id,
-            StudentId: studentId
-        }));
-        try {
-            await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
-            fetchParcelas(studentId);
-        } catch (error) {
-            console.error('Erro ao pagar parcelas:', error);
-            alert('Erro ao pagar parcelas.');
         }
     };
 
