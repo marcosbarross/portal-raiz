@@ -19,18 +19,22 @@ namespace api_raiz.Models
         public DateTime Date { get; set; }
         
         [Required]
-        public Double TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
+        
+        [Required]
+        public int GroupId { get; set; }
 
         public ICollection<EventStudent> EventStudents { get; set; } = new List<EventStudent>();
 
         public Event() { }
 
-        public Event(string name, int installments, DateTime date, Double totalPrice)
+        public Event(string name, int installments, DateTime date, double totalPrice, int groupId)
         {
             Name = name;
             Installments = installments;
             Date = date;
             TotalPrice = totalPrice;
+            GroupId = groupId;
         }
     }
 }

@@ -14,5 +14,12 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="postgres@dpg-cs3bg3lds78s73aedq8g-a.oregon-postgres.render.com" uuid="b6150b71-d63f-4551-847d-4f407584d5a1">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://dpg-cs3bg3lds78s73aedq8g-a.oregon-postgres.render.com:5432/postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

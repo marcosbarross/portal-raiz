@@ -11,9 +11,11 @@ namespace api_raiz.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
 
+        public Context(DbContextOptions<Context> options) : base(options) { }
+        public Context() { }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
             var host = Environment.GetEnvironmentVariable("DB_HOST");
             var port = Environment.GetEnvironmentVariable("DB_PORT");
             var database = Environment.GetEnvironmentVariable("DB_NAME");
@@ -21,11 +23,10 @@ namespace api_raiz.Data
             var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+            Console.WriteLine($"Connection String: {connectionString}");
             optionsBuilder.UseNpgsql(connectionString);
-            
-            //optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=portal_raiz;Username=postgres;Password=root;");
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -48,8 +49,5 @@ namespace api_raiz.Data
                 .WithMany(g => g.Students)
                 .HasForeignKey(s => s.GroupId);
         }
-
-
-        public Context() { }
     }
 }

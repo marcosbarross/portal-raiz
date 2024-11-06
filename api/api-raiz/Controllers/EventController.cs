@@ -53,6 +53,7 @@ namespace api_raiz.Controllers
                     Id = evento.Id,
                     Name = evento.Name,
                     Installments = evento.Installments,
+                    GroupId = evento.GroupId,
                     Date = evento.Date,
                     TotalPrice = evento.TotalPrice,
                     Students = evento.EventStudents.Select(es => new StudentDto
@@ -64,21 +65,6 @@ namespace api_raiz.Controllers
                 };
 
                 return Ok(eventDetails);
-            }
-        }
-
-        
-        [HttpGet("GetEventById/{id}")]
-        public IActionResult GetEventById(int id)
-        {
-            using (var context = new Context())
-            {
-                var evento = context.Events.Find(id);
-                if (evento == null)
-                {
-                    return NotFound();
-                }
-                return Ok(evento);
             }
         }
     }

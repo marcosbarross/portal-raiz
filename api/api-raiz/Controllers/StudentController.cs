@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_raiz.Data;
 using api_raiz.Models;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace api_raiz.Controllers
 {
@@ -174,5 +172,23 @@ namespace api_raiz.Controllers
                 return Ok(studentGroup);
             }
         }
+        
+        [HttpGet("GetStudentsByGroup/{groupId}")]
+        public IActionResult GetStudentsByGroup(int groupId)
+        {
+            using (var context = new Context())
+            {
+                var students = context.Students
+                    .Where(s => s.GroupId == groupId)
+                    .ToList();
+
+                if (students == null || students.Count == 0)
+                {
+                    return NotFound(new { message = "Nenhum aluno encontrado para o grupo especificado." });
+                }
+                return Ok(students);
+            }
+        }
+
     }
 }
