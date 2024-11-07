@@ -25,11 +25,9 @@ function CustomNavbar() {
               </LinkContainer>
             </NavDropdown>
 
-            <NavDropdown title="Menu de eventos" id="basic-nav-dropdown">
-              <LinkContainer to="/novoFinanceiro">
-                <NavDropdown.Item>Adicionar evento</NavDropdown.Item>
-              </LinkContainer>
-            </NavDropdown>
+            <LinkContainer to="/novoFinanceiro">
+              <Nav.Link>Adicionar evento</Nav.Link>
+            </LinkContainer>
 
             <LinkContainer to="/geradorRecibos">
               <Nav.Link>Gerador de recibos</Nav.Link>

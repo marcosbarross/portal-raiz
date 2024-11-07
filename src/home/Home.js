@@ -36,7 +36,7 @@ function Home() {
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
-                <Card.Title>Venda de produtos</Card.Title>
+                <Card.Title>Venda de fardamentos</Card.Title>
                 <Button variant="primary">
                   <LinkContainer to={"/itens"}>
                     <Nav.Link>Abrir</Nav.Link>
