@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import CustomNavbar from '../components/CustomNavbar';
 import jsPDF from 'jspdf';
 import { Container, Button, Form, Spinner, Table, Accordion } from "react-bootstrap";
@@ -10,60 +10,75 @@ function DetalheEvento() {
     const { id } = useParams();
     const [event, setEvent] = useState(null);
     const [showAddStudentForm, setShowAddStudentForm] = useState(false);
-    const [levels, setLevels] = useState([]);
-    const [groups, setGroups] = useState([]);
     const [students, setStudents] = useState([]);
     const [newStudent, setNewStudent] = useState({
-        Level: '',
-        GroupId: '',
         Registration: ''
     });
     const [loadingParcelas, setLoadingParcelas] = useState({});
     const [parcelas, setParcelas] = useState({});
-    
-    const handleAddStudentToggle = () => {
-        setShowAddStudentForm(!showAddStudentForm);
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchEventDetails();
     }, [id]);
-    
+
     const fetchEventDetails = async () => {
         try {
             const response = await axios.get(`${getApiUrl()}/event/GetEventDetails/${id}`);
             const eventData = response.data;
-            console.log('Detalhes do evento:', eventData);  // Verifique a resposta
             eventData.Students = eventData.Students?.$values || [];
             setEvent(eventData);
-            setStudents(eventData.Students); // Atualiza o estado com os alunos do evento
+
+            // Carrega os alunos do grupo vinculado ao evento
+            if (eventData.GroupId) {
+                fetchStudentsByGroup(eventData.GroupId);
+            }
         } catch (error) {
             console.error('Erro ao carregar detalhes do evento:', error);
         }
     };
 
-    const fetchParcelas = async (studentId) => {
-        setLoadingParcelas({ ...loadingParcelas, [studentId]: true });
+    const fetchStudentsByGroup = async (groupId) => {
         try {
-            const response = await axios.get(`${getApiUrl()}/student/GetStudentParcelas/${studentId}`);
-            setParcelas({ ...parcelas, [studentId]: response.data?.$values || [] });
+            const response = await axios.get(`${getApiUrl()}/group/GetGroupDetail/${groupId}`);
+            const studentsData = response.data?.Students?.$values || [];
+            setStudents(studentsData);
         } catch (error) {
-            console.error('Erro ao carregar parcelas do aluno:', error);
-            setParcelas({ ...parcelas, [studentId]: [] });
-        } finally {
-            setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
+            console.error('Erro ao carregar alunos do grupo:', error);
+        }
+    };
+
+    const handleAddStudentToggle = () => {
+        setShowAddStudentForm(!showAddStudentForm);
+    };
+
+    const handleAddStudent = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.post(`${getApiUrl()}/student/AddStudentToEvent`, {
+                EventId: id,
+                Registration: newStudent.Registration
+            });
+            setNewStudent({ Registration: '' });
+            setShowAddStudentForm(false);
+            fetchEventDetails();
+        } catch (error) {
+            console.error('Erro ao adicionar aluno:', error);
+            alert('Erro ao adicionar aluno. Verifique se o aluno já está registrado no evento.');
         }
     };
 
     const handlePagarParcelas = async (studentId) => {
-        const selectedParcelas = parcelas[studentId].filter(parcela => parcela.paid && !parcela.Paid).map(parcela => ({
-            InstallmentNumber: parcela.InstallmentNumber,
-            Paid: true,
-            Valor: event.TotalPrice / event.Installments,
-            EventId: id,
-            StudentId: studentId
-        }));
-    
+        const selectedParcelas = parcelas[studentId]
+            .filter(parcela => parcela.paid && !parcela.Paid)
+            .map(parcela => ({
+                InstallmentNumber: parcela.InstallmentNumber,
+                Paid: true,
+                Valor: event.TotalPrice / event.Installments,
+                EventId: id,
+                StudentId: studentId
+            }));
+
         try {
             await axios.post(`${getApiUrl()}/student/PagarParcelas`, selectedParcelas);
             fetchParcelas(studentId);
@@ -76,7 +91,10 @@ function DetalheEvento() {
     };
 
     const handleGerarPDF = (studentName, parcelasPagas) => {
-        const pdf = new jsPDF({ unit: 'mm', format: [80, 297] });
+        const pdf = new jsPDF({
+            unit: 'mm',
+            format: [80, 297]
+        });
         const docWidth = pdf.internal.pageSize.getWidth();
 
         pdf.setFontSize(8);
@@ -94,8 +112,8 @@ function DetalheEvento() {
         let yPos = 45;
         let total = 0;
 
-        parcelasPagas.forEach((parcela, index) => {
-            const descricao = `${parcela.InstallmentNumber}ª parcela`;
+        parcelasPagas.forEach((parcela) => {
+            const descricao = ` ${parcela.InstallmentNumber}ª parcela`;
             const preco = `R$ ${parcela.Valor}`;
             pdf.text(descricao, 10, yPos);
             pdf.text(preco, 50, yPos);
@@ -106,18 +124,24 @@ function DetalheEvento() {
         });
 
         pdf.text(`Total: R$ ${total.toFixed(2)}`, 10, yPos + 5);
-        yPos += 15;
-        pdf.text('Obrigado!', 10, yPos);
+        pdf.text('Obrigado!', 10, yPos + 15);
 
         const string = pdf.output('bloburl');
         window.open(string, '_blank');
     };
 
-    const handleToggleAccordion = (studentId) => {
-        if (!parcelas[studentId]) {
-            fetchParcelas(studentId);
+    const fetchParcelas = async (studentId) => {
+        setLoadingParcelas({ ...loadingParcelas, [studentId]: true });
+        try {
+            const response = await axios.get(`${getApiUrl()}/student/GetStudentParcelas/${studentId}`);
+            setParcelas({ ...parcelas, [studentId]: response.data?.$values || [] });
+        } catch (error) {
+            console.error('Erro ao carregar parcelas do aluno:', error);
+            setParcelas({ ...parcelas, [studentId]: [] });
+        } finally {
+            setLoadingParcelas({ ...loadingParcelas, [studentId]: false });
         }
-    };    
+    };
 
     const handleCheckboxChange = (studentId, parcelaIndex) => {
         const updatedParcelas = { ...parcelas };
@@ -137,26 +161,9 @@ function DetalheEvento() {
         }
     };
 
-    const handleStudentFormChange = (e) => {
-        const { name, value } = e.target;
-        setNewStudent((prevState) => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleAddStudentSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(`${getApiUrl()}/student/AddStudent`, newStudent);
-            if (response.status === 200) {
-                alert('Aluno adicionado com sucesso!');
-                setShowAddStudentForm(false);
-                fetchEventDetails(); // Atualiza os detalhes do evento com o aluno recém-adicionado
-            }
-        } catch (error) {
-            console.error('Erro ao adicionar aluno:', error);
-            alert('Erro ao adicionar aluno.');
+    const handleToggleAccordion = (studentId) => {
+        if (!parcelas[studentId]) {
+            fetchParcelas(studentId);
         }
     };
 
@@ -166,12 +173,9 @@ function DetalheEvento() {
             <Container className="mt-4">
                 {event ? (
                     <>
-                        <h1>
-                            {event.Name} {event.Group && `- Turma: ${event.Group.Name} (${event.Group.Level}, ${event.Group.Shift})`}
-                        </h1>
-
+                        <h1>{event.Name}</h1>
                         <p>Data: {new Date(event.Date).toLocaleDateString()}</p>
-                        <p>Pagamento: R${event.TotalPrice} reais em {event.Installments} parcelas de R$ {(event.TotalPrice / event.Installments).toFixed(2)}</p>
+                        <p>Pagamento: R${event.TotalPrice} reais em {event.Installments} parcelas de R$ {event.TotalPrice / event.Installments}</p>
 
                         <Button variant="primary" onClick={handleAddStudentToggle}>
                             {showAddStudentForm ? 'Cancelar' : 'Adicionar Aluno'}
@@ -179,35 +183,38 @@ function DetalheEvento() {
                         <br />
 
                         {showAddStudentForm && (
-                            <Form onSubmit={handleAddStudentSubmit}>
-                                <Form.Group controlId="formStudent">
-                                    <Form.Label>Aluno</Form.Label>
-                                    <Form.Control 
-                                        as="select" 
-                                        name="Registration" 
-                                        value={newStudent.Registration} 
-                                        onChange={handleStudentFormChange}
-                                    >
-                                        <option value="">Selecione um aluno</option>
-                                        {students.map((student) => (
-                                            <option key={student.Registration} value={student.Registration}>
-                                                {student.Name}
-                                            </option>
-                                        ))}
-                                    </Form.Control>
-                                </Form.Group>
-                                                                
+                            <Container className="mb-3">
+                                <Form onSubmit={handleAddStudent} className="mt-4">
+                                    <Form.Group controlId="formStudent">
+                                        <Form.Label>Aluno</Form.Label>
+                                        <Form.Select
+                                            aria-label="Selecione o aluno"
+                                            value={newStudent.Registration}
+                                            onChange={(e) => setNewStudent({ ...newStudent, Registration: e.target.value })}
+                                        >
+                                            <option value="">Selecione o aluno</option>
+                                            {students.map((student) => (
+                                                <option key={student.Registration} value={student.Registration}>
+                                                    {student.Name} (Responsável: {student.Responsible})
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
 
-                                <Button variant="primary" type="submit">Adicionar</Button>
-                            </Form>
+                                    <Button type="submit" variant="success" className="mt-3">
+                                        Adicionar
+                                    </Button>
+                                </Form>
+                            </Container>
                         )}
 
+                        <br />
                         <h3>Alunos confirmados</h3>
                         <Accordion defaultActiveKey="0">
                             {event.Students.map(student => (
                                 <Accordion.Item eventKey={student.Registration} key={student.Registration}>
                                     <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
-                                        {`${student.Name}, (Responsável: ${student.Responsible})`}
+                                        {`${student.Name}, Responsável: (${student.Responsible})` }
                                     </Accordion.Header>
                                     <Accordion.Body>
                                         {loadingParcelas[student.Registration] ? (
@@ -218,17 +225,20 @@ function DetalheEvento() {
                                                     <tr>
                                                         <th>Parcela</th>
                                                         <th>Pago</th>
+                                                        <th>Selecionar</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {parcelas[student.Registration]?.map((parcela, index) => (
                                                         <tr key={index}>
-                                                            <td>{parcela.InstallmentNumber}ª parcela</td>
+                                                            <td>{parcela.InstallmentNumber}</td>
+                                                            <td>{parcela.Paid ? 'Sim' : 'Não'}</td>
                                                             <td>
                                                                 <Form.Check
                                                                     type="checkbox"
                                                                     checked={parcela.paid || parcela.Paid}
                                                                     onChange={() => handleCheckboxChange(student.Registration, index)}
+                                                                    disabled={parcela.Paid}
                                                                 />
                                                             </td>
                                                         </tr>
@@ -236,6 +246,9 @@ function DetalheEvento() {
                                                 </tbody>
                                             </Table>
                                         )}
+                                        <Button variant="primary" onClick={() => handlePagarParcelas(student.Registration)} className="mt-3">
+                                            Pagar Parcelas Selecionadas
+                                        </Button>
                                     </Accordion.Body>
                                 </Accordion.Item>
                             ))}
