@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://localhost:3000")
+        builder => builder.WithOrigins("https://portalraiz.netlify.app/")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
