@@ -4,9 +4,9 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# Copie o certificado SSL autoassinado para o container
-COPY /etc/ssl/certs/selfsigned.crt /etc/ssl/certs/
-COPY /etc/ssl/private/selfsigned.key /etc/ssl/private/
+# Copia o certificado SSL autoassinado para o container
+COPY selfsigned.crt /etc/ssl/certs/
+COPY selfsigned.key /etc/ssl/private/
 
 # Estágio de build com imagem do SDK do .NET
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
