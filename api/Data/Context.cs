@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using api_raiz.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace api_raiz.Data
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<IdentityUser>
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Student> Students { get; set; }
@@ -11,20 +13,9 @@ namespace api_raiz.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
 
-        public Context(DbContextOptions<Context> options) : base(options) { }
         public Context() { }
-        
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var host = Environment.GetEnvironmentVariable("DB_HOST");
-            var port = Environment.GetEnvironmentVariable("DB_PORT");
-            var database = Environment.GetEnvironmentVariable("DB_NAME");
-            var username = Environment.GetEnvironmentVariable("DB_USER");
-            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
-            optionsBuilder.UseNpgsql(connectionString);
-        }
+        public Context(DbContextOptions<Context> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,7 +33,7 @@ namespace api_raiz.Data
                 .HasOne(es => es.Student)
                 .WithMany(s => s.EventStudents)
                 .HasForeignKey(es => es.StudentId);
-            
+
             modelBuilder.Entity<Student>()
                 .HasOne(s => s.Group)
                 .WithMany(g => g.Students)

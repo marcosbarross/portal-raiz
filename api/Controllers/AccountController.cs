@@ -1,18 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using api_raiz.Models;
+using System.Threading.Tasks;
 
 namespace api_raiz.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public AccountController(SignInManager<IdentityUser> signInManager)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpPost("Login")]
@@ -36,5 +39,34 @@ namespace api_raiz.Controllers
             await _signInManager.SignOutAsync();
             return Ok(new { message = "Logout bem-sucedido" });
         }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] Register model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new IdentityUser { UserName = model.Username, Email = model.Email };
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new { message = "Usuário registrado com sucesso!" });
+                }
+
+                return BadRequest(new { message = "Erro ao registrar o usuário", errors = result.Errors });
+            }
+            return BadRequest(new { message = "Requisição inválida" });
+        }
+
+        [HttpGet("IsAuthenticated")]
+        public IActionResult IsAuthenticated()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Ok(new { isAuthenticated = true });
+            }
+            return Unauthorized(new { isAuthenticated = false });
+        }
+
     }
 }
