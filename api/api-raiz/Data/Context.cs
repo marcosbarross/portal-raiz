@@ -23,7 +23,6 @@ namespace api_raiz.Data
             var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
-            Console.WriteLine($"Connection String: {connectionString}");
             optionsBuilder.UseNpgsql(connectionString);
         }
 

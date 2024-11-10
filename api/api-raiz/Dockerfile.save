@@ -1,12 +1,15 @@
 # Estágio de runtime com imagem do ASP.NET
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 443
+EXPOSE 443
+
+# Copia o certificado SSL autoassinado para o container
+COPY selfsigned.crt /etc/ssl/certs/
+COPY selfsigned.key /etc/ssl/private/
 
 # Estágio de build com imagem do SDK do .NET
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copia o arquivo do projeto e restaura as dependências
@@ -18,19 +21,16 @@ COPY . .
 WORKDIR "/src/."
 
 # Compila o projeto
-RUN dotnet build "api-raiz.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "api-raiz.csproj" -c Release -o /app/build
 
 # Estágio de publish
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-
-# Publica o projeto
-RUN dotnet publish "api-raiz.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "api-raiz.csproj" -c Release -o /app/publish
 
 # Estágio final - runtime apenas
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Inicia a aplicação
+# Configuração do ponto de entrada
 ENTRYPOINT ["dotnet", "api-raiz.dll"]
