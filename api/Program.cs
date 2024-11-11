@@ -1,8 +1,13 @@
-using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using api_raiz.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 using api_raiz.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -19,17 +24,38 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://portalraizapi.xyz")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+        policyBuilder => policyBuilder
+            .WithOrigins("http://portalraizapi.xyz")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 builder.Services.AddDbContext<Context>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")));
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 4;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit = false;
+})
+.AddEntityFrameworkStores<Context>()
+.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.LoginPath = "/api/Account/Login";
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
-// Run migrations at startup
+// Executar migrações no startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -40,12 +66,11 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // Log any errors that occur during migration
         Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
     }
 }
 
-// Configure the HTTP request pipeline.
+// Configurar o pipeline de requisições HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -56,6 +81,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigin");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
