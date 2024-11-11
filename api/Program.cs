@@ -7,10 +7,8 @@ using api_raiz.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Carregar a configuração do appsettings.json
 var configuration = builder.Configuration;
 
-// Configurar controladores e JSON serialization options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -20,41 +18,44 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Adicionar suporte para documentação Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurar política CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         policyBuilder => policyBuilder
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins("http://portalraizapi.xyz")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
 });
 
-// Configurar o contexto do banco de dados usando a string de conexão do appsettings.json
 builder.Services.AddDbContext<Context>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-// Configurar Identity e cookies de autenticação
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<Context>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 4;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit = false;
+})
+.AddEntityFrameworkStores<Context>()
+.AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    options.LoginPath = "/api/Account/Login"; // Altere conforme a rota de login da sua API
+    options.LoginPath = "/api/Account/Login";
     options.SlidingExpiration = true;
 });
 
 var app = builder.Build();
 
-// Executar migrações no startup
+// Executar migraÃ§Ãµes no startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -69,7 +70,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configurar o pipeline de requisições HTTP
+// Configurar o pipeline de requisiÃ§Ãµes HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
