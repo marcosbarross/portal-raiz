@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=portalraizdb_358k
+      - DB_USER=raiz
+      - DB_PASSWORD=FkYKkhgrxyo8qbz1EcOxvSa2hNB5rPDk
+      - DB_CONNECTION_STRING=Host=db;Port=5432;Database=portalraizdb_358k;Username=raiz;Password=FkYKkhgrxyo8qbz1EcOxvSa2hNB5rPDk
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: portalraizdb_358k
+      POSTGRES_USER: raiz
+      POSTGRES_PASSWORD: FkYKkhgrxyo8qbz1EcOxvSa2hNB5rPDk
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
