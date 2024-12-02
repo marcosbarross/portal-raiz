@@ -1,4 +1,5 @@
-FROM node:14-alpine
+# Etapa 1: Construção da aplicação React
+FROM node:14-alpine as react-build
 
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
@@ -15,9 +16,14 @@ COPY . .
 # Compila a aplicação React para produção
 RUN npm run build
 
-# Usa o servidor web nginx para servir os arquivos estáticos
+# Etapa 2: Servir a aplicação com Nginx
 FROM nginx:alpine
-COPY --from=0 /app/build /usr/share/nginx/html
+
+# Copia a configuração do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copia os arquivos compilados da etapa de construção para o Nginx
+COPY --from=react-build /app/build /usr/share/nginx/html
 
 # Exponha a porta do container (geralmente 80 para aplicações servidas por nginx)
 EXPOSE 80
