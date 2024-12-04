@@ -53,9 +53,20 @@ function CustomNavbar() {
                 <NavDropdown.Item>Relatorio</NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
+
+            <NavDropdown title="Menu de eventos" id="basic-nav-dropdown">
+              <LinkContainer to="/novoFinanceiro">
+                <NavDropdown.Item>Eventos por turma</NavDropdown.Item>
+              </LinkContainer>
+              <LinkContainer to="/AddNewGeneralEventsPage">
+                <NavDropdown.Item>Eventos gerais</NavDropdown.Item>
+              </LinkContainer>
+            </NavDropdown>
+
             <LinkContainer to="/novoFinanceiro">
               <Nav.Link>Adicionar evento</Nav.Link>
             </LinkContainer>
+
             <LinkContainer to="/geradorRecibos">
               <Nav.Link>Gerador de recibos</Nav.Link>
             </LinkContainer>

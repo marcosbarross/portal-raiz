@@ -13,6 +13,9 @@ import TurmaDetalhe from './turmasPages/TurmaDetalhe';
 import Login from './authPages/Login';
 import Register from './authPages/Register';
 import PrivateRoute from './authPages/PrivateRoute';
+import AddNewGeneralEventPage from './generalEvents/AddNewGeneralEventsPage';
+import EditGeneralEventPage from './generalEvents/EditGeneralEventPage.jsx';
+import EventDetailsPage from './generalEvents/EventDetailsPage';
 
 const App = () => {
     return (
@@ -26,11 +29,14 @@ const App = () => {
                 <Route path="/vendas" element={<PrivateRoute element={<Vendas />} />} />
                 <Route path="/relatorio" element={<PrivateRoute element={<RelatorioVendas />} />} />
                 <Route path="/geradorRecibos" element={<PrivateRoute element={<GeradorRecibos />} />} />
-                <Route path="/novoFinanceiro" element={<PrivateRoute element={<NovoFinanceiro />} />}/>
-                <Route path="/DetalheEvento/:id" element={<PrivateRoute element={<DetalheEvento />} />}/>
+                <Route path="/novoFinanceiro" element={<PrivateRoute element={<NovoFinanceiro />} />} />
+                <Route path="/DetalheEvento/:id" element={<PrivateRoute element={<DetalheEvento />} />} />
                 <Route path="/AddAlunos" element={<PrivateRoute element={<AddAlunos />} />} />
                 <Route path="/Turmas" element={<PrivateRoute element={<Turmas />} />} />
                 <Route path="/TurmaDetalhe/:id" element={<PrivateRoute element={<TurmaDetalhe />} />} />
+                <Route path="/AddNewGeneralEventsPage" element={<PrivateRoute element={<AddNewGeneralEventPage />} />} />
+                <Route path="/EditGeneralEvent/:id" element={<PrivateRoute element={<EditGeneralEventPage />} />} />
+                <Route path="/ViewGeneralEvent/:id" element={<PrivateRoute element={<EventDetailsPage />} />} />
             </Routes>
         </Router>
     );

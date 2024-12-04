@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_raiz.Data;
 using api_raiz.Models;
+using api_raiz.Dtos;
 
 namespace api_raiz.Controllers
 {
@@ -84,7 +85,52 @@ namespace api_raiz.Controllers
                 return Ok();
             }
         }
-        
+
+        [HttpPost("AddStudentToGeneralEvent")]
+        public IActionResult AddStudentToGeneralEvent([FromBody] GeneralEventStudentDto dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest(new { message = "Dados inválidos." });
+            }
+
+            using (var context = new Context())
+            {
+                var student = context.Students.Find(dto.StudentId);
+                if (student == null)
+                {
+                    return NotFound(new { message = "Estudante não encontrado." });
+                }
+
+                var generalEvent = context.GeneralEvents.Find(dto.GeneralEventId);
+                if (generalEvent == null)
+                {
+                    return NotFound(new { message = "Evento Geral não encontrado." });
+                }
+
+                var existingRecord = context.GeneralEventStudents
+                    .FirstOrDefault(ges => ges.StudentId == dto.StudentId && ges.GeneralEventId == dto.GeneralEventId);
+
+                if (existingRecord != null)
+                {
+                    return Conflict(new { message = "Estudante já registrado no Evento Geral." });
+                }
+
+                var generalEventStudent = new GeneralEventStudent
+                {
+                    GeneralEventId = dto.GeneralEventId,
+                    StudentId = dto.StudentId,
+                    PaidInstallments = dto.PaidInstallments
+                };
+
+                context.GeneralEventStudents.Add(generalEventStudent);
+                context.SaveChanges();
+
+                return Ok(new { message = "Estudante adicionado ao Evento Geral com sucesso." });
+            }
+        }
+
+
         [HttpGet("GetStudentParcelas/{studentId}")]
         public IActionResult GetStudentParcelas(int studentId)
         {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Nav, Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { Nav, Container, Row, Col, Button, Card, Dropdown, DropdownButton } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import CustomNavbar from '../components/CustomNavbar';
 import './Home.css';
@@ -55,11 +55,17 @@ function Home() {
               />
               <Card.Body className="text-center">
                 <Card.Title>Financeiro de eventos</Card.Title>
-                <Button variant="primary">
-                  <LinkContainer to={"/NovoFinanceiro"}>
-                    <Nav.Link>Abrir</Nav.Link>
-                  </LinkContainer>
-                </Button>
+                <DropdownButton id="dropdown-basic-button" title="Abrir como">
+                  <Dropdown.Item>
+                    <LinkContainer to={"/NovoFinanceiro"}>
+                      <Nav.Link>Eventos de turma</Nav.Link>
+                    </LinkContainer></Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/AddNewGeneralEventsPage"}>
+                      <Nav.Link>Eventos gerais</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                </DropdownButton>
               </Card.Body>
             </Card>
           </Col>

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using api_raiz.Data;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using api_raiz.Data;
 
 namespace api_raiz.Models
 {
@@ -16,16 +16,15 @@ namespace api_raiz.Models
 
         [Required]
         public string Responsible { get; set; }
-        
+
         public int GroupId { get; set; }
         [ForeignKey("id")]
         public Group Group { get; set; }
 
+        public ICollection<GeneralEventStudent> GeneralEventStudents { get; set; } = new List<GeneralEventStudent>();
         public ICollection<EventStudent> EventStudents { get; set; } = new List<EventStudent>();
 
-        public Student()
-        {
-        }
+        public Student() { }
 
         public Student(StudentDto studentDTO)
         {
@@ -33,5 +32,4 @@ namespace api_raiz.Models
             Responsible = studentDTO.Responsible;
         }
     }
-
 }
