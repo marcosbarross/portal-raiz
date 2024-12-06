@@ -22,6 +22,8 @@ namespace api_raiz.Models
 
         public ICollection<GeneralEventStudent> GeneralEventStudents { get; set; } = new List<GeneralEventStudent>();
 
+        public ICollection<GeneralEventStudentsInstallments> GeneralEventStudentsInstallments { get; set; } = new List<GeneralEventStudentsInstallments>();
+
         public GeneralEvent() { }
     }
 }

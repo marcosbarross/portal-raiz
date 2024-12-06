@@ -178,7 +178,7 @@ function DetalheEvento() {
                         <p>Pagamento: R${event.TotalPrice} reais em {event.Installments} parcelas de R$ {event.TotalPrice / event.Installments}</p>
 
                         <Button variant="primary" onClick={handleAddStudentToggle}>
-                            {showAddStudentForm ? 'Cancelar' : 'Adicionar Aluno'}
+                            {showAddStudentForm ? 'Cancelar' : 'Adicionar aluno'}
                         </Button>
                         <br />
 
@@ -214,7 +214,7 @@ function DetalheEvento() {
                             {event.Students.map(student => (
                                 <Accordion.Item eventKey={student.Registration} key={student.Registration}>
                                     <Accordion.Header onClick={() => handleToggleAccordion(student.Registration)}>
-                                        {`${student.Name}, Responsável: (${student.Responsible})` }
+                                        {`${student.Name}, Responsável: ${student.Responsible}` }
                                     </Accordion.Header>
                                     <Accordion.Body>
                                         {loadingParcelas[student.Registration] ? (
@@ -247,7 +247,7 @@ function DetalheEvento() {
                                             </Table>
                                         )}
                                         <Button variant="primary" onClick={() => handlePagarParcelas(student.Registration)} className="mt-3">
-                                            Pagar Parcelas Selecionadas
+                                            Pagar parcelas selecionadas
                                         </Button>
                                     </Accordion.Body>
                                 </Accordion.Item>

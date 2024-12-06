@@ -16,7 +16,7 @@ function GeneralEventsPage() {
 
     useEffect(() => {
         loadGeneralEvents();
-    }, []);
+    }, []);    
 
     const loadGeneralEvents = () => {
         fetch(`${getApiUrl()}/GeneralEvent/GetGeneralEvents`)
