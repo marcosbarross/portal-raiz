@@ -13,6 +13,7 @@ namespace api_raiz.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<GeneralEvent> GeneralEvents { get; set; }
         public DbSet<GeneralEventStudent> GeneralEventStudents { get; set; }
+        public DbSet<GeneralEventStudentsInstallments> GeneralEventStudentsInstallments { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
 
         public Context() { }
@@ -20,21 +21,12 @@ namespace api_raiz.Data
         public Context(DbContextOptions<Context> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {   
-            /*
-            var host = Environment.GetEnvironmentVariable("DB_HOST");
-            var port = Environment.GetEnvironmentVariable("DB_PORT");
-            var database = Environment.GetEnvironmentVariable("DB_NAME");
-            var username = Environment.GetEnvironmentVariable("DB_USER");
-            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            */
-
+        {
             var host = "localhost";
             var port = "5432";
             var database = "portal_raiz";
             var username = "postgres";
             var password = "root";
-
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
             optionsBuilder.UseNpgsql(connectionString);
@@ -74,6 +66,19 @@ namespace api_raiz.Data
                 .HasOne(s => s.Group)
                 .WithMany(g => g.Students)
                 .HasForeignKey(s => s.GroupId);
+
+            modelBuilder.Entity<GeneralEventStudentsInstallments>()
+                .HasKey(gei => new { gei.EventId, gei.StudentId, gei.InstallmentNumber });
+
+            modelBuilder.Entity<GeneralEventStudentsInstallments>()
+                .HasOne(gei => gei.GeneralEvent)
+                .WithMany(ge => ge.GeneralEventStudentsInstallments)
+                .HasForeignKey(gei => gei.EventId);
+
+            modelBuilder.Entity<GeneralEventStudentsInstallments>()
+                .HasOne(gei => gei.Student)
+                .WithMany(s => s.GeneralEventStudentsInstallments)
+                .HasForeignKey(gei => gei.StudentId);
         }
     }
 }
