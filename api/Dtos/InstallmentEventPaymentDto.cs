@@ -1,6 +1,6 @@
 ﻿namespace api_raiz.Data
 {
-    public class InstallmentPaymentDto
+    public class InstallmentEventPaymentDto
     {
         public int EventId { get; set; }
         public int StudentId { get; set; }

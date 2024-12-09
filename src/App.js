@@ -16,6 +16,7 @@ import PrivateRoute from './authPages/PrivateRoute';
 import AddNewGeneralEventPage from './generalEvents/AddNewGeneralEventsPage';
 import EditGeneralEventPage from './generalEvents/EditGeneralEventPage.jsx';
 import EventDetailsPage from './generalEvents/EventDetailsPage';
+import StudentPaymentsPage from './generalEvents/StudentPaymentsPage.jsx'
 
 const App = () => {
     return (
@@ -37,6 +38,7 @@ const App = () => {
                 <Route path="/AddNewGeneralEventsPage" element={<PrivateRoute element={<AddNewGeneralEventPage />} />} />
                 <Route path="/EditGeneralEvent/:id" element={<PrivateRoute element={<EditGeneralEventPage />} />} />
                 <Route path="/ViewGeneralEvent/:id" element={<PrivateRoute element={<EventDetailsPage />} />} />
+                <Route path="/event/:id/student/:studentId/payments" element={<PrivateRoute element={<StudentPaymentsPage />}/>} />
             </Routes>
         </Router>
     );

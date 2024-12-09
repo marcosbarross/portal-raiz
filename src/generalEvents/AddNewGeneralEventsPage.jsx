@@ -16,7 +16,7 @@ function GeneralEventsPage() {
 
     useEffect(() => {
         loadGeneralEvents();
-    }, []);
+    }, []);    
 
     const loadGeneralEvents = () => {
         fetch(`${getApiUrl()}/GeneralEvent/GetGeneralEvents`)
@@ -152,7 +152,7 @@ function GeneralEventsPage() {
             </Form>
 
             <br />
-            <h3>Eventos Gerais</h3>
+            <h3>Eventos gerais</h3>
             <Table striped bordered hover>
                 <thead>
                     <tr>

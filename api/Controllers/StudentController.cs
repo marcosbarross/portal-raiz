@@ -2,6 +2,8 @@
 using api_raiz.Data;
 using api_raiz.Models;
 using api_raiz.Dtos;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace api_raiz.Controllers
 {
@@ -16,6 +18,69 @@ namespace api_raiz.Controllers
             {
                 var students = context.Students.ToList();
                 return Ok(students);
+            }
+        }
+
+        [HttpGet("GetStudentName/{studentId}")]
+        public IActionResult GetStudentName(int studentId)
+        {
+            using (var context = new Context())
+            {
+                var student = context.Students.Find(studentId);
+
+                if (student == null)
+                {
+                    return NotFound(new { message = "Estudante não encontrado." });
+                }
+
+                string nameJson = "{ \"name\": \"" + student.Name + "\" }";
+
+
+                return Ok(nameJson);
+            }
+        }
+
+
+        [HttpGet("GetGeneralEventInstallments/{studentId}/{generalEventId}")]
+        public IActionResult GetGeneralEventInstallments(int studentId, int generalEventId)
+        {
+            using (var context = new Context())
+            {
+                var generalEventStudent = context.GeneralEventStudents
+                    .Include(ges => ges.GeneralEvent)
+                    .FirstOrDefault(ges => ges.StudentId == studentId && ges.GeneralEventId == generalEventId);
+
+                if (generalEventStudent == null)
+                {
+                    return NotFound();
+                }
+
+                var generalEvent = context.GeneralEvents.Find(generalEventStudent.GeneralEventId);
+
+                if (generalEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var installments = new List<InstallmentDetailDto>();
+
+                for (int i = 1; i <= generalEventStudent.GeneralEvent.Installments; i++)
+                {
+                    var installment = context.GeneralEventStudentsInstallments
+                        .FirstOrDefault(gei => gei.EventId == generalEventId && gei.StudentId == studentId && gei.InstallmentNumber == i);
+
+                    installments.Add(new InstallmentDetailDto
+                    {
+                        InstallmentNumber = i,
+                        Paid = installment != null,
+                        EventId = generalEventStudent.GeneralEventId,
+                        StudentId = generalEventStudent.StudentId,
+                        Installment = generalEventStudent.GeneralEvent.TotalPrice / generalEvent.Installments,
+                        PayDate = installment?.PayDate
+                    });
+                }
+
+                return Ok(installments);
             }
         }
 
@@ -195,6 +260,43 @@ namespace api_raiz.Controllers
             }
         }
 
+        [HttpPost("PayGeneralEventInstallment")]
+        public IActionResult PayGeneralEventInstallment([FromBody] InstallmentGeneralEventPaymentDto request)
+        {
+            using (var context = new Context())
+            {
+                var generalEventStudent = context.GeneralEventStudents
+                    .FirstOrDefault(ges => ges.StudentId == request.StudentId && ges.GeneralEventId == request.GeneralEventId);
+                if (generalEventStudent == null)
+                {
+                    return NotFound(new { message = "Registro de Estudante no Evento Geral não encontrado." });
+                }
+
+                for (int i = 0; i < request.InstallmentsToPay; i++)
+                {
+                    int installmentNumber = generalEventStudent.PaidInstallments + 1;
+
+                    var installment = new GeneralEventStudentsInstallments
+                    {
+                        EventId = request.GeneralEventId,
+                        StudentId = request.StudentId,
+                        InstallmentNumber = installmentNumber,
+                        PayDate = DateTime.UtcNow
+                    };
+
+                    context.GeneralEventStudentsInstallments.Add(installment);
+
+                    generalEventStudent.PaidInstallments += 1;
+                }
+
+                context.GeneralEventStudents.Update(generalEventStudent);
+                context.SaveChanges();
+
+                return Ok(new { message = "Parcelas pagas com sucesso." });
+            }
+        }
+
+
         [HttpPost("GetStudentGroupNameByStudentId")]
         public IActionResult GetStudentGroupNameByStudentId(List<int> StudentsIds)
         {
@@ -218,7 +320,7 @@ namespace api_raiz.Controllers
                 return Ok(studentGroup);
             }
         }
-        
+
         [HttpGet("GetStudentsByGroup/{groupId}")]
         public IActionResult GetStudentsByGroup(int groupId)
         {
@@ -236,5 +338,24 @@ namespace api_raiz.Controllers
             }
         }
 
+        [HttpDelete("RemoveStudentFromGeneralEvent")]
+        public IActionResult RemoveStudentFromGeneralEvent(int generalEventId, int studentId)
+        {
+            using (var context = new Context())
+            {
+                var generalEventStudent = context.GeneralEventStudents
+                    .FirstOrDefault(ges => ges.GeneralEventId == generalEventId && ges.StudentId == studentId);
+
+                if (generalEventStudent == null)
+                {
+                    return NotFound(new { message = "Registro não encontrado para o Estudante no Evento Geral." });
+                }
+
+                context.GeneralEventStudents.Remove(generalEventStudent);
+                context.SaveChanges();
+
+                return Ok(new { message = "Estudante removido do Evento Geral com sucesso." });
+            }
+        }
     }
 }
