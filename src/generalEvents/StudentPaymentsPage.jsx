@@ -71,16 +71,16 @@ function StudentPaymentsPage() {
             const descricao = `${parcela.InstallmentNumber}ª parcela - Pago em: ${new Date(parcela.PayDate).toLocaleDateString()}`;
             const preco = `R$ ${(parcela.Installment ?? 0).toFixed(2)}`;
             pdf.text(descricao, 10, yPos);
-            yPos += 10;
+            yPos += 5;
             pdf.text(preco, 10, yPos);
-            yPos += 10;
+            yPos += 7;
     
             pdf.line(10, yPos - 5, 80, yPos - 5);
             total += parcela.Installment ?? 0;
         });
     
         pdf.text(`Total: R$ ${total.toFixed(2)}`, 10, yPos + 5);
-        pdf.text("Obrigado!", 10, yPos + 15);
+        pdf.text("Obrigado!", 10, yPos + 10);
     
         const string = pdf.output("bloburl");
         window.open(string, "_blank");
@@ -104,7 +104,6 @@ function StudentPaymentsPage() {
                     throw new Error("Erro ao processar pagamento");
                 }
                 alert("Pagamento realizado com sucesso!");
-                handleGerarPDF();
                 window.location.reload();
             })
             .catch((err) => alert(err.message));
@@ -179,11 +178,19 @@ function StudentPaymentsPage() {
                 <p className="mt-3"><b>Troco:</b> R$ {change >= 0 ? change.toFixed(2) : "Valor insuficiente"}</p>
 
                 <Button
-                    className="mt-3"
+                    className="mt-3 me-3"
                     onClick={handlePayment}
                     disabled={selectedInstallments === 0 || change < 0}
                 >
                     Realizar pagamento
+                </Button>
+
+                <Button 
+                    className="mt-3"
+                    onClick={handleGerarPDF}
+                    variant="info"
+                >
+                    Gerar recibo
                 </Button>
             </Container>
             <br />

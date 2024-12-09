@@ -63,10 +63,6 @@ function CustomNavbar() {
               </LinkContainer>
             </NavDropdown>
 
-            <LinkContainer to="/novoFinanceiro">
-              <Nav.Link>Adicionar evento</Nav.Link>
-            </LinkContainer>
-
             <LinkContainer to="/geradorRecibos">
               <Nav.Link>Gerador de recibos</Nav.Link>
             </LinkContainer>
