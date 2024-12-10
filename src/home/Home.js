@@ -37,11 +37,22 @@ function Home() {
               />
               <Card.Body className="text-center">
                 <Card.Title>Venda de fardamentos</Card.Title>
-                <Button variant="primary">
-                  <LinkContainer to={"/itens"}>
-                    <Nav.Link>Abrir</Nav.Link>
-                  </LinkContainer>
-                </Button>
+                <DropdownButton id="dropdown-basic-button" title="Abrir como">
+                  <Dropdown.Item>
+                    <LinkContainer to={"/itens"}>
+                      <Nav.Link>Ver fardamentos</Nav.Link>
+                    </LinkContainer></Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/vendas"}>
+                      <Nav.Link>Vender fardamentos</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/relatorio"}>
+                      <Nav.Link>Relatório</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                </DropdownButton>
               </Card.Body>
             </Card>
           </Col>
