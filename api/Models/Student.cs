@@ -18,7 +18,7 @@ namespace api_raiz.Models
         public string Responsible { get; set; }
 
         public int GroupId { get; set; }
-        [ForeignKey("id")]
+        [ForeignKey("GroupId")]
         public Group Group { get; set; }
 
         public ICollection<GeneralEventStudent> GeneralEventStudents { get; set; } = new List<GeneralEventStudent>();
@@ -26,6 +26,8 @@ namespace api_raiz.Models
         public ICollection<GeneralEventStudentsInstallments> GeneralEventStudentsInstallments { get; set; } = new List<GeneralEventStudentsInstallments>();
 
         public ICollection<EventStudent> EventStudents { get; set; } = new List<EventStudent>();
+
+        public ICollection<OrderStudentProduct> OrderStudentProducts { get; set; } = new List<OrderStudentProduct>();
 
         public Student() { }
 

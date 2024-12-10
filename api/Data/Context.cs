@@ -15,6 +15,8 @@ namespace api_raiz.Data
         public DbSet<GeneralEventStudent> GeneralEventStudents { get; set; }
         public DbSet<GeneralEventStudentsInstallments> GeneralEventStudentsInstallments { get; set; }
         public DbSet<EventStudent> EventStudents { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderStudentProduct> OrderStudentProducts { get; set; }
 
         public Context() { }
 
@@ -22,11 +24,11 @@ namespace api_raiz.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var host = "localhost";
-            var port = "5432";
-            var database = "portal_raiz";
-            var username = "postgres";
-            var password = "root";
+            var host = Environment.GetEnvironmentVariable("DB_HOST");
+            var port = Environment.GetEnvironmentVariable("DB_PORT");
+            var database = Environment.GetEnvironmentVariable("DB_NAME");
+            var username = Environment.GetEnvironmentVariable("DB_USER");
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
             optionsBuilder.UseNpgsql(connectionString);
@@ -79,6 +81,25 @@ namespace api_raiz.Data
                 .HasOne(gei => gei.Student)
                 .WithMany(s => s.GeneralEventStudentsInstallments)
                 .HasForeignKey(gei => gei.StudentId);
+
+            modelBuilder.Entity<OrderStudentProduct>()
+                .HasKey(osp => new { osp.OrderId, osp.StudentId, osp.ProductId });
+
+            modelBuilder.Entity<OrderStudentProduct>()
+                .HasOne(osp => osp.Order)
+                .WithMany(o => o.OrderStudentProducts)
+                .HasForeignKey(osp => osp.OrderId);
+
+            modelBuilder.Entity<OrderStudentProduct>()
+                .HasOne(osp => osp.Student)
+                .WithMany(s => s.OrderStudentProducts)
+                .HasForeignKey(osp => osp.StudentId);
+
+            modelBuilder.Entity<OrderStudentProduct>()
+                .HasOne(osp => osp.Product)
+                .WithMany(p => p.OrderStudentProducts)
+                .HasForeignKey(osp => osp.ProductId);
+
         }
     }
 }
