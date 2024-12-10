@@ -16,6 +16,8 @@ namespace api_raiz.Models
         public int RemainingAmount { get; set; }
         public int SoldAmount { get; set; }
 
+        public ICollection<OrderStudentProduct> OrderStudentProducts { get; set; } = new List<OrderStudentProduct>();
+
         public Product(int id, string name, int size, double price, int remainingAmount)
         {
             Id = id;
@@ -25,7 +27,7 @@ namespace api_raiz.Models
             RemainingAmount = remainingAmount;
             SoldAmount = 0;
         }
-        
+
         public string intToString(int size_int)
         {
             switch (size_int)
@@ -45,7 +47,7 @@ namespace api_raiz.Models
             }
         }
     }
-    
+
     public class ProductAlternativeSize
     {
         public int Id { get; set; }
@@ -65,7 +67,7 @@ namespace api_raiz.Models
             SoldAmount = product.SoldAmount;
         }
     }
-    
+
     public class ProductResponse
     {
         public List<Product> Products { get; set; }
