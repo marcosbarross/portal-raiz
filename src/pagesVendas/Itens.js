@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Table } from 'react-bootstrap';
+import { Container, Form, Button, Table, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import CustomNavbar from '../components/CustomNavbar';
 import getApiUrl from '../util/api';
@@ -10,6 +10,9 @@ function Itens() {
   const [preco, setPreco] = useState('');
   const [tamanho, setTamanho] = useState('');
   const [estoque, setEstoque] = useState('');
+  const [busca, setBusca] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [produtoToDelete, setProdutoToDelete] = useState(null);
 
   useEffect(() => {
     loadProdutos();
@@ -19,8 +22,14 @@ function Itens() {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
         if (response.data && response.data.Products && response.data.Products.$values) {
-          const produtosNormais = response.data.Products.$values;
-          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values : [];
+          const produtosNormais = response.data.Products.$values.map(produto => ({
+            ...produto,
+            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
+          }));
+          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values.map(produto => ({
+            ...produto,
+            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
+          })) : [];
           setProdutos([...produtosNormais, ...produtosAlternativos]);
         } else {
           console.error('API response is not in expected format:', response.data);
@@ -35,7 +44,13 @@ function Itens() {
 
   const handleAddProduto = (e) => {
     e.preventDefault();
-    const newProduto = { name: nome, price: parseFloat(preco), size: tamanho, remainingAmount: parseInt(estoque), soldAmount: 0 };
+    const newProduto = {
+      name: nome,
+      price: parseFloat(preco),
+      size: tamanho,
+      remainingAmount: parseInt(estoque),
+      soldAmount: 0
+    };
     axios.post(`${getApiUrl()}/Product/AddProduct`, newProduto)
       .then(() => {
         loadProdutos();
@@ -47,11 +62,31 @@ function Itens() {
       .catch(error => console.error('Error adding product:', error));
   };
 
-  const handleDeleteProduto = (id) => {
-    axios.delete(`${getApiUrl()}/Product/DeleteProduct/${id}`)
-      .then(() => loadProdutos())
-      .catch(error => console.error('Error deleting product:', error));
+  const handleDeleteProduto = () => {
+    if (produtoToDelete) {
+      axios.delete(`${getApiUrl()}/Product/DeleteProduct/${produtoToDelete.Id}`)
+        .then(() => {
+          loadProdutos();
+          handleCloseModal();
+        })
+        .catch(error => console.error('Error deleting product:', error));
+    }
   };
+
+  const handleShowModal = (produto) => {
+    setProdutoToDelete(produto);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setProdutoToDelete(null);
+  };
+
+  const produtosFiltrados = produtos.filter(produto => (
+    produto.Name?.toLowerCase().includes(busca.toLowerCase()) ||
+    (produto.Size && produto.Size.toLowerCase().includes(busca.toLowerCase()))
+  ));
 
   return (
     <>
@@ -75,23 +110,22 @@ function Itens() {
             <Form.Label>Tamanho</Form.Label>
             <Form.Select aria-label="Tamanho" value={tamanho} onChange={(e) => setTamanho(e.target.value)} required>
               <option value="">Selecione o tamanho...</option>
-              <option value="2">2</option>
-              <option value="4">4</option>
-              <option value="6">6</option>
-              <option value="8">8</option>
-              <option value="10">10</option>
-              <option value="12">12</option>
-              <option value="14">14</option>
-              <option value="16">16</option>
-              <option value="18">PP</option>
-              <option value="20">P</option>
-              <option value="22">M</option>
-              <option value="24">G</option>
-              <option value="26">GG</option>
+              {/* Adicione os valores de tamanho aqui */}
             </Form.Select>
           </Form.Group>
           <Button type="submit" className="mt-3">Adicionar produto</Button>
         </Form>
+
+        <Form.Group className="mt-4">
+          <Form.Label>Buscar produtos</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Digite o nome ou tamanho do produto"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </Form.Group>
+
         <h2 className="mt-5">Produtos cadastrados</h2>
         <Table striped bordered hover>
           <thead>
@@ -104,20 +138,33 @@ function Itens() {
             </tr>
           </thead>
           <tbody>
-            {produtos.map(produto => (
+            {produtosFiltrados.map(produto => (
               <tr key={produto.Id}>
                 <td>{produto.Name}</td>
                 <td>{produto.Price}</td>
                 <td>{produto.Size}</td>
                 <td>{produto.RemainingAmount}</td>
                 <td>
-                  <Button variant="danger" onClick={() => handleDeleteProduto(produto.Id)}>Excluir</Button>
+                  <Button variant="danger" onClick={() => handleShowModal(produto)}>Excluir</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </Container>
+
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmação</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Tem certeza que deseja excluir o produto "{produtoToDelete?.Name}"?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+          <Button variant="danger" onClick={handleDeleteProduto}>Excluir</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

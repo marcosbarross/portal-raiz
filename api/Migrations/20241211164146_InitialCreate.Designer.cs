@@ -12,8 +12,8 @@ using api_raiz.Data;
 namespace api_raiz.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241210134652_remove product from order")]
-    partial class removeproductfromorder
+    [Migration("20241211164146_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -375,6 +375,9 @@ namespace api_raiz.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Identificator")
+                        .HasColumnType("integer");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
@@ -396,6 +399,12 @@ namespace api_raiz.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDelivered")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OrderIdentificator")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProductQuantity")
                         .HasColumnType("integer");

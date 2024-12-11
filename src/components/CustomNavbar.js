@@ -50,7 +50,10 @@ function CustomNavbar() {
                 <NavDropdown.Item>Vender</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/relatorio">
-                <NavDropdown.Item>Relatorio</NavDropdown.Item>
+                <NavDropdown.Item>Relatorio geral</NavDropdown.Item>
+              </LinkContainer>
+              <LinkContainer to="/OrderList">
+                <NavDropdown.Item>Relatorio de pedidos</NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
 

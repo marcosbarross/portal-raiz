@@ -372,6 +372,9 @@ namespace api_raiz.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Identificator")
+                        .HasColumnType("integer");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
@@ -396,6 +399,9 @@ namespace api_raiz.Migrations
 
                     b.Property<bool>("IsDelivered")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("OrderIdentificator")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProductQuantity")
                         .HasColumnType("integer");

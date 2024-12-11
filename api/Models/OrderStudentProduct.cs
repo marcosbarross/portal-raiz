@@ -7,7 +7,6 @@ namespace api_raiz.Models
 {
     public class OrderStudentProduct
     {
-        [Key]
         public int OrderId { get; set; }
 
         [ForeignKey("OrderId")]
@@ -28,6 +27,9 @@ namespace api_raiz.Models
 
         [Required]
         public DateTime Date { get; set; }
+
+        [Required]
+        public int OrderIdentificator { get; set; }
         public bool IsDelivered { get; set; }
 
         public OrderStudentProduct() { }
@@ -49,6 +51,7 @@ namespace api_raiz.Models
             ProductId = orderDto.ProductId;
             ProductQuantity = orderDto.ProductQuantity;
             Date = orderDto.Date;
+            OrderIdentificator = orderDto.Identificator;
             IsDelivered = isDelivered;
         }
     }
