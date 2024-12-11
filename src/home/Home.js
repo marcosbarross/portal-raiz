@@ -36,6 +36,7 @@ function Home() {
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
+
                 <Card.Title>Fardamentos</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
