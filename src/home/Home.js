@@ -49,7 +49,12 @@ function Home() {
                   </Dropdown.Item>
                   <Dropdown.Item>
                     <LinkContainer to={"/relatorio"}>
-                      <Nav.Link>Relatório</Nav.Link>
+                      <Nav.Link>Relatório geral</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/OrderList"}>
+                      <Nav.Link>Relatório de pedidos</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
                 </DropdownButton>
@@ -65,7 +70,7 @@ function Home() {
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
-                <Card.Title>ventos</Card.Title>
+                <Card.Title>Eventos</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
                     <LinkContainer to={"/NovoFinanceiro"}>
