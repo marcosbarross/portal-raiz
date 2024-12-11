@@ -10,6 +10,7 @@ function Itens() {
   const [preco, setPreco] = useState('');
   const [tamanho, setTamanho] = useState('');
   const [estoque, setEstoque] = useState('');
+  const [busca, setBusca] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [produtoToDelete, setProdutoToDelete] = useState(null);
 
@@ -21,8 +22,14 @@ function Itens() {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
         if (response.data && response.data.Products && response.data.Products.$values) {
-          const produtosNormais = response.data.Products.$values;
-          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values : [];
+          const produtosNormais = response.data.Products.$values.map(produto => ({
+            ...produto,
+            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
+          }));
+          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values.map(produto => ({
+            ...produto,
+            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
+          })) : [];
           setProdutos([...produtosNormais, ...produtosAlternativos]);
         } else {
           console.error('API response is not in expected format:', response.data);
@@ -37,7 +44,13 @@ function Itens() {
 
   const handleAddProduto = (e) => {
     e.preventDefault();
-    const newProduto = { name: nome, price: parseFloat(preco), size: tamanho, remainingAmount: parseInt(estoque), soldAmount: 0 };
+    const newProduto = {
+      name: nome,
+      price: parseFloat(preco),
+      size: tamanho,
+      remainingAmount: parseInt(estoque),
+      soldAmount: 0
+    };
     axios.post(`${getApiUrl()}/Product/AddProduct`, newProduto)
       .then(() => {
         loadProdutos();
@@ -70,6 +83,11 @@ function Itens() {
     setProdutoToDelete(null);
   };
 
+  const produtosFiltrados = produtos.filter(produto => (
+    produto.Name?.toLowerCase().includes(busca.toLowerCase()) ||
+    (produto.Size && produto.Size.toLowerCase().includes(busca.toLowerCase()))
+  ));
+
   return (
     <>
       <CustomNavbar />
@@ -92,23 +110,22 @@ function Itens() {
             <Form.Label>Tamanho</Form.Label>
             <Form.Select aria-label="Tamanho" value={tamanho} onChange={(e) => setTamanho(e.target.value)} required>
               <option value="">Selecione o tamanho...</option>
-              <option value="2">2</option>
-              <option value="4">4</option>
-              <option value="6">6</option>
-              <option value="8">8</option>
-              <option value="10">10</option>
-              <option value="12">12</option>
-              <option value="14">14</option>
-              <option value="16">16</option>
-              <option value="18">PP</option>
-              <option value="20">P</option>
-              <option value="22">M</option>
-              <option value="24">G</option>
-              <option value="26">GG</option>
+              {/* Adicione os valores de tamanho aqui */}
             </Form.Select>
           </Form.Group>
           <Button type="submit" className="mt-3">Adicionar produto</Button>
         </Form>
+
+        <Form.Group className="mt-4">
+          <Form.Label>Buscar produtos</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Digite o nome ou tamanho do produto"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </Form.Group>
+
         <h2 className="mt-5">Produtos cadastrados</h2>
         <Table striped bordered hover>
           <thead>
@@ -121,7 +138,7 @@ function Itens() {
             </tr>
           </thead>
           <tbody>
-            {produtos.map(produto => (
+            {produtosFiltrados.map(produto => (
               <tr key={produto.Id}>
                 <td>{produto.Name}</td>
                 <td>{produto.Price}</td>
