@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Table } from 'react-bootstrap';
+import { Container, Form, Button, Table, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import CustomNavbar from '../components/CustomNavbar';
 import getApiUrl from '../util/api';
@@ -10,6 +10,8 @@ function Itens() {
   const [preco, setPreco] = useState('');
   const [tamanho, setTamanho] = useState('');
   const [estoque, setEstoque] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [produtoToDelete, setProdutoToDelete] = useState(null);
 
   useEffect(() => {
     loadProdutos();
@@ -47,10 +49,25 @@ function Itens() {
       .catch(error => console.error('Error adding product:', error));
   };
 
-  const handleDeleteProduto = (id) => {
-    axios.delete(`${getApiUrl()}/Product/DeleteProduct/${id}`)
-      .then(() => loadProdutos())
-      .catch(error => console.error('Error deleting product:', error));
+  const handleDeleteProduto = () => {
+    if (produtoToDelete) {
+      axios.delete(`${getApiUrl()}/Product/DeleteProduct/${produtoToDelete.Id}`)
+        .then(() => {
+          loadProdutos();
+          handleCloseModal();
+        })
+        .catch(error => console.error('Error deleting product:', error));
+    }
+  };
+
+  const handleShowModal = (produto) => {
+    setProdutoToDelete(produto);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setProdutoToDelete(null);
   };
 
   return (
@@ -111,13 +128,26 @@ function Itens() {
                 <td>{produto.Size}</td>
                 <td>{produto.RemainingAmount}</td>
                 <td>
-                  <Button variant="danger" onClick={() => handleDeleteProduto(produto.Id)}>Excluir</Button>
+                  <Button variant="danger" onClick={() => handleShowModal(produto)}>Excluir</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </Container>
+
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmação</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Tem certeza que deseja excluir o produto "{produtoToDelete?.Name}"?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+          <Button variant="danger" onClick={handleDeleteProduto}>Excluir</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

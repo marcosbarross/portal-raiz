@@ -36,12 +36,32 @@ function Home() {
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
+<<<<<<< Updated upstream
                 <Card.Title>Venda de fardamentos</Card.Title>
                 <Button variant="primary">
                   <LinkContainer to={"/itens"}>
                     <Nav.Link>Abrir</Nav.Link>
                   </LinkContainer>
                 </Button>
+=======
+                <Card.Title>Fardamentos</Card.Title>
+                <DropdownButton id="dropdown-basic-button" title="Abrir como">
+                  <Dropdown.Item>
+                    <LinkContainer to={"/itens"}>
+                      <Nav.Link>Ver fardamentos</Nav.Link>
+                    </LinkContainer></Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/vendas"}>
+                      <Nav.Link>Vender fardamentos</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                  <Dropdown.Item>
+                    <LinkContainer to={"/relatorio"}>
+                      <Nav.Link>Relatório</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                </DropdownButton>
+>>>>>>> Stashed changes
               </Card.Body>
             </Card>
           </Col>
@@ -54,7 +74,7 @@ function Home() {
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
-                <Card.Title>Financeiro de eventos</Card.Title>
+                <Card.Title>ventos</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
                     <LinkContainer to={"/NovoFinanceiro"}>

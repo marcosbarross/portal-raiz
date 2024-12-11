@@ -70,6 +70,7 @@ namespace api_raiz.Controllers
 
                     var order = new Order
                     {
+                        Identificator = item.Identificator,
                         StudentId = item.StudentId
                     };
 
@@ -83,6 +84,7 @@ namespace api_raiz.Controllers
                         ProductId = item.ProductId,
                         ProductQuantity = item.ProductQuantity,
                         Date = item.Date,
+                        OrderIdentificator = item.Identificator,
                         IsDelivered = false
                     };
 

@@ -123,7 +123,7 @@ function Vendas() {
     const currentDate = new Date().toISOString();
   
     const orderItems = itensPedido.map((item) => ({
-      Id: orderId,
+      Identificator: orderId,
       ProductId: item.productId,
       ProductQuantity: item.quantity,
       StudentId: parseInt(selectedStudent),
