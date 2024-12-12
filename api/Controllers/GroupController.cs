@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using api_raiz.Data;
-using api_raiz.Models;
+using api_raiz.Dtos.StudentsDto;
 using Microsoft.AspNetCore.Mvc;
-using Group = api_raiz.Models.Group;
+using Group = api_raiz.Models.GroupModels.Group;
 
 namespace api_raiz.Controllers;
 

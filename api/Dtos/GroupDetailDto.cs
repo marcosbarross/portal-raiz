@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using api_raiz.Dtos.StudentsDto;
 using api_raiz.Models;
 
 namespace api_raiz.Data

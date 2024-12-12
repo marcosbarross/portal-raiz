@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api_raiz.Models;
+namespace api_raiz.Models.GroupModels;
 
 [Route("/")]
 public class Group
@@ -14,10 +14,10 @@ public class Group
 
     [Required]
     public string level { get; set; }
-    
+
     [Required]
     public string shift { get; set; }
-    
+
     public ICollection<Student> Students { get; set; } = new List<Student>();
 
     public Group() { }

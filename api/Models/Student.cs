@@ -1,4 +1,6 @@
-﻿using api_raiz.Data;
+﻿using api_raiz.Dtos.StudentsDto;
+using api_raiz.Models.GroupModels;
+using api_raiz.Models.Relationships;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

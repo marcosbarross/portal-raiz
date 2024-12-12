@@ -1,5 +1,5 @@
 ﻿using api_raiz.Models;
-namespace api_raiz.Data;
+namespace api_raiz.Dtos.StudentsDto;
 
 public class StudentGroupDto
 {
@@ -19,6 +19,6 @@ public class StudentGroupDto
 
     public StudentGroupDto()
     {
-        
+
     }
 }

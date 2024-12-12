@@ -119,7 +119,7 @@ const OrderList = () => {
 
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Detalhes do Pedido</Modal.Title>
+            <Modal.Title>Detalhes do pedido</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {selectedOrder && (

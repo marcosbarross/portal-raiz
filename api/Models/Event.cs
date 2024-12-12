@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using api_raiz.Models.Relationships;
 
 namespace api_raiz.Models
 {

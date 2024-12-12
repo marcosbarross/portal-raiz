@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Table, Container, Button, Modal } from 'react-bootstrap';
+import { Table, Container, Button, Modal, Form } from 'react-bootstrap';
 import axios from 'axios';
 import getApiUrl from '../util/api';
 import CustomNavbar from '../components/CustomNavbar';
@@ -11,6 +11,7 @@ function TurmaDetalhe() {
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [studentIdToDelete, setStudentIdToDelete] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleDeleteStudent = (StudentId) => {
         setShowModal(true);
@@ -63,6 +64,11 @@ function TurmaDetalhe() {
         return <p>Carregando...</p>;
     }
 
+    const filteredStudents = groupData.Students.filter(student => 
+        student.Name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        student.Responsible.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <>
         <CustomNavbar />
@@ -70,6 +76,16 @@ function TurmaDetalhe() {
         <Container>
             <h1>{groupData.Name}, {groupData.Shift}</h1>
             <p>{groupData.Level}</p>
+
+            <Form.Group controlId="search">
+                <Form.Label>Buscar Aluno ou Responsável</Form.Label>
+                <Form.Control
+                    type="text"
+                    placeholder="Digite o nome do aluno ou responsável"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
+            </Form.Group>
 
             <h2>Alunos</h2>
             <Table striped bordered hover>
@@ -83,7 +99,7 @@ function TurmaDetalhe() {
                     </tr>
                 </thead>
                 <tbody>
-                    {groupData.Students && groupData.Students.map((student, index) => (
+                    {filteredStudents.map((student, index) => (
                         <tr key={student.Registration}>
                             <td>{index + 1}</td>
                             <td>{student.Name}</td>

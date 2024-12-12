@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace api_raiz.Dtos
+namespace api_raiz.Dtos.OrderDto
 {
     public class OrderStudentProductDto
     {

@@ -1,9 +1,9 @@
-﻿using api_raiz.Dtos;
+﻿using api_raiz.Dtos.OrderDto;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_raiz.Models
+namespace api_raiz.Models.Relationships
 {
     public class OrderStudentProduct
     {

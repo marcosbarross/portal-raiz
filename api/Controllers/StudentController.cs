@@ -4,6 +4,9 @@ using api_raiz.Models;
 using api_raiz.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
+using api_raiz.Models.Relationships;
+using api_raiz.Dtos.StudentsDto;
+using api_raiz.Dtos.InstallmentsDto;
 
 namespace api_raiz.Controllers
 {
