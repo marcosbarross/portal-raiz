@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using api_raiz.Data;
@@ -11,9 +12,11 @@ using api_raiz.Data;
 namespace api_raiz.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20241212135800_AddLevelShiftGradeTables")]
+    partial class AddLevelShiftGradeTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -276,16 +279,11 @@ namespace api_raiz.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("LevelId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LevelId");
 
                     b.ToTable("Grades");
                 });
@@ -603,17 +601,6 @@ namespace api_raiz.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api_raiz.Models.GroupModels.Grade", b =>
-                {
-                    b.HasOne("api_raiz.Models.GroupModels.Level", "Level")
-                        .WithMany("Grades")
-                        .HasForeignKey("LevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Level");
-                });
-
             modelBuilder.Entity("api_raiz.Models.GroupModels.Group", b =>
                 {
                     b.HasOne("api_raiz.Models.GroupModels.Grade", "Grade")
@@ -734,8 +721,6 @@ namespace api_raiz.Migrations
 
             modelBuilder.Entity("api_raiz.Models.GroupModels.Level", b =>
                 {
-                    b.Navigation("Grades");
-
                     b.Navigation("Groups");
                 });
 

@@ -315,7 +315,7 @@ namespace api_raiz.Controllers
                         var group = context.Groups.Find(studentDto.GroupId);
                         if (group != null)
                         {
-                            student.GroupName = group.name;
+                            student.GroupName = group.Name;
                             studentGroup.Add(student);
                         }
                     }
