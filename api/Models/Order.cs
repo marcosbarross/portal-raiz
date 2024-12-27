@@ -1,4 +1,5 @@
-﻿using api_raiz.Dtos;
+﻿using api_raiz.Dtos.OrderDto;
+using api_raiz.Models.Relationships;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

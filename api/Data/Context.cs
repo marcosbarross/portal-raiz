@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using api_raiz.Models;
 using Microsoft.AspNetCore.Identity;
+using api_raiz.Models.Relationships;
+using api_raiz.Models.GroupModels;
 
 namespace api_raiz.Data
 {
@@ -17,6 +19,9 @@ namespace api_raiz.Data
         public DbSet<EventStudent> EventStudents { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStudentProduct> OrderStudentProducts { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
+        public DbSet<Grade> Grades { get; set; }
+        public DbSet<Level> Levels { get; set; }
 
         public Context() { }
 
@@ -30,6 +35,13 @@ namespace api_raiz.Data
             var username = Environment.GetEnvironmentVariable("DB_USER");
             var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
+            /*
+            var host = "localhost";
+            var port = "5432";
+            var database = "portal_raiz";
+            var username = "postgres";
+            var password = "root";
+            */
             var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
             optionsBuilder.UseNpgsql(connectionString);
         }
@@ -100,6 +112,25 @@ namespace api_raiz.Data
                 .WithMany(p => p.OrderStudentProducts)
                 .HasForeignKey(osp => osp.ProductId);
 
+            modelBuilder.Entity<Group>()
+                .HasOne(g => g.Shift)
+                .WithMany(s => s.Groups)
+                .HasForeignKey(g => g.ShiftId);
+
+            modelBuilder.Entity<Group>()
+                .HasOne(g => g.Grade)
+                .WithMany(gr => gr.Groups)
+                .HasForeignKey(g => g.GradeId);
+
+            modelBuilder.Entity<Group>()
+                .HasOne(g => g.Level)
+                .WithMany(l => l.Groups)
+                .HasForeignKey(g => g.LevelId);
+
+            modelBuilder.Entity<Grade>()
+                .HasOne(g => g.Level)
+                .WithMany(l => l.Grades)
+                .HasForeignKey(g => g.LevelId);
         }
     }
 }

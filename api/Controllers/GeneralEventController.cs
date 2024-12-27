@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using api_raiz.Data;
-using api_raiz.Models;
 using Microsoft.EntityFrameworkCore;
+using api_raiz.Models.Relationships;
 
 namespace api_raiz.Controllers
 {

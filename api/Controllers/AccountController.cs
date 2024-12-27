@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using api_raiz.Models;
 using System.Threading.Tasks;
+using api_raiz.Models.Auth;
 
 namespace api_raiz.Controllers
 {

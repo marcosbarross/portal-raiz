@@ -1,4 +1,6 @@
-﻿namespace api_raiz.Data;
+﻿using api_raiz.Dtos.StudentsDto;
+
+namespace api_raiz.Data;
 
 public class EventDetailsDto
 {

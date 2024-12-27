@@ -114,11 +114,30 @@ function Home() {
               />
               <Card.Body className="text-center">
                 <Card.Title>Painel de turmas</Card.Title>
-                <Button variant="primary">
-                  <LinkContainer to={"/Turmas"}>
-                    <Nav.Link>Abrir</Nav.Link>
-                  </LinkContainer>
-                </Button>
+                <DropdownButton id="dropdown-basic-button" title="Abrir como">
+                  <Dropdown.Item>
+                    <LinkContainer to={"/Turmas"}>
+                      <Nav.Link>Ver turmas</Nav.Link>
+                    </LinkContainer></Dropdown.Item>
+
+                  <Dropdown.Item>
+                    <LinkContainer to={"/Grades"}>
+                      <Nav.Link>Ver séries</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>  
+
+                  <Dropdown.Item>
+                    <LinkContainer to={"/Levels"}>
+                      <Nav.Link>Ver níveis</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+
+                  <Dropdown.Item>
+                    <LinkContainer to={"/Shifts"}>
+                      <Nav.Link>Ver turnos</Nav.Link>
+                    </LinkContainer>
+                  </Dropdown.Item>
+                </DropdownButton>
               </Card.Body>
             </Card>
           </Col>

@@ -1,4 +1,4 @@
-﻿namespace api_raiz.Data
+﻿namespace api_raiz.Dtos.InstallmentsDto
 {
     public class InstallmentEventPaymentDto
     {

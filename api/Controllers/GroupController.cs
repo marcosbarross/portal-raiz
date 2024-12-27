@@ -1,37 +1,63 @@
-﻿using System.Text.RegularExpressions;
-using api_raiz.Data;
-using api_raiz.Models;
+﻿using api_raiz.Data;
+using api_raiz.Dtos.StudentsDto;
 using Microsoft.AspNetCore.Mvc;
-using Group = api_raiz.Models.Group;
+using System.Linq;
+using Group = api_raiz.Models.GroupModels.Group;
 
-namespace api_raiz.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class GroupController : ControllerBase
+namespace api_raiz.Controllers
 {
-    [HttpGet("GetGroups")]
-    public IActionResult GetGroups()
+    [Route("api/[controller]")]
+    [ApiController]
+    public class GroupController : ControllerBase
     {
-        using (var context = new Context())
-        {
-            return Ok(context.Groups.ToList());
-        }
-    }
+        private readonly Context _context;
 
-    [HttpGet("GetGroupDetail/{id}")]
-    public IActionResult GetGroupDetail(int id)
-    {
-        using (var context = new Context())
+        public GroupController(Context context)
         {
-            var group = context.Groups
-                .Where(g => g.id == id)
+            _context = context;
+        }
+
+        [HttpGet("GetGroups")]
+        public IActionResult GetGroups()
+        {
+            return Ok(_context.Groups.ToList());
+        }
+
+        [HttpGet("GetGroupsDetails")]
+        public IActionResult GetGroupsDetails()
+        {
+            var groups = _context.Groups
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Name,
+                    LevelName = g.Level.Name,
+                    ShiftName = g.Shift.Name
+                })
+                .ToList();
+
+            var response = groups.Select(group => new GroupDetailDto(
+                group.Id,
+                group.Name,
+                group.LevelName,
+                group.ShiftName
+            )).ToList();
+
+            return Ok(response);
+        }
+
+
+        [HttpGet("GetGroupDetail/{id}")]
+        public IActionResult GetGroupDetail(int id)
+        {
+            var group = _context.Groups
+                .Where(g => g.Id == id)
                 .Select(g => new GroupDetailDto
                 {
-                    Id = g.id,
-                    Name = g.name,
-                    Level = g.level,
-                    Shift = g.shift,
+                    Id = g.Id,
+                    Name = g.Name,
+                    Level = g.Level.Name,
+                    Shift = g.Shift.Name,
                     Students = g.Students.Select(s => new StudentDto
                     {
                         Registration = s.Registration,
@@ -46,56 +72,45 @@ public class GroupController : ControllerBase
             {
                 return NotFound();
             }
+
             return Ok(group);
         }
-    }
 
-
-    
-    [HttpPost("AddGroup")]
-    public IActionResult AddGroup(Group group)
-    {
-        using (var context = new Context())
+        [HttpPost("AddGroup")]
+        public IActionResult AddGroup(GroupDto groupDto)
         {
-            context.Groups.Add((group));
-            context.SaveChanges();
+            var group = new Group(groupDto);
+            _context.Groups.Add(group);
+            _context.SaveChanges();
             return Ok();
         }
-    }
 
-    [HttpDelete("RemoveGroup")]
-    public IActionResult RemoveGroup(int id)
-    {
-        using (var context = new Context())
+        [HttpDelete("RemoveGroup/{id}")]
+        public IActionResult RemoveGroup(int id)
         {
-            var group = context.Groups.Find(id);
+            var group = _context.Groups.Find(id);
             if (group == null)
             {
                 return NotFound();
             }
 
-            context.Groups.Remove(group);
-            context.SaveChanges();
+            _context.Groups.Remove(group);
+            _context.SaveChanges();
             return Ok();
         }
-    }
-    
-    [HttpDelete("RemoveStudentFromGroup/{studentId}")]
-    public IActionResult RemoveStudentFromGroup(int studentId)
-    {
-        using (var context = new Context())
+
+        [HttpDelete("RemoveStudentFromGroup/{studentId}")]
+        public IActionResult RemoveStudentFromGroup(int studentId)
         {
-            var student = context.Students.Find((studentId));
+            var student = _context.Students.Find(studentId);
             if (student == null)
             {
                 return NotFound();
             }
-            else
-            {
-                context.Students.Remove(student);
-                context.SaveChanges();
-            }
-            return Ok(); 
+
+            _context.Students.Remove(student);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

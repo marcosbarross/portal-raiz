@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using api_raiz.Data;
 
-namespace api_raiz.Models
+namespace api_raiz.Models.Relationships
 {
     public class EventStudent
     {
@@ -17,6 +17,6 @@ namespace api_raiz.Models
         [Required] public int StudentId { get; set; }
 
         [ForeignKey("StudentId")] public Student Student { get; set; }
-        
+
     }
 }

@@ -6,8 +6,8 @@ public class GroupDto
 {
     public int id { get; set; }
     public string name { get; set; }
-    public string level { get; set; }
-    public string shift { get; set; }
-    public ICollection<Student> Students { get; set; }
+    public int levelId { get; set; }
+    public int shiftId { get; set; }
+    public int gradeId { get; set; }
     
 }

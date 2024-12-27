@@ -1,6 +1,6 @@
 ﻿using api_raiz.Models;
 
-namespace api_raiz.Data;
+namespace api_raiz.Dtos.StudentsDto;
 
 public class StudentEventDto
 {

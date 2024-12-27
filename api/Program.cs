@@ -4,6 +4,7 @@ using api_raiz.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
 using api_raiz.Data;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +13,10 @@ var configuration = builder.Configuration;
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-        options.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.WriteIndented = true;
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -25,7 +26,6 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         policyBuilder => policyBuilder
-            .WithOrigins("http://portalraizapi.xyz")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -55,7 +55,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// Executar migrações no startup
+// Executar migrações no início
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api_raiz.Models
+namespace api_raiz.Models.Relationships
 {
     public class GeneralEventStudentsInstallments
     {

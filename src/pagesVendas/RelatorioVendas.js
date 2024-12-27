@@ -12,9 +12,9 @@ function RelatorioVendas() {
   const carregarProdutos = useCallback(() => {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
-        if (response.data && response.data.Products && response.data.Products.$values) {
-          const produtosNormais = response.data.Products.$values;
-          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values : [];
+        if (response.data && response.data.products) {
+          const produtosNormais = response.data.products;
+          const produtosAlternativos = response.data.productsAlternativeSize || [];
           const todosProdutos = [...produtosNormais, ...produtosAlternativos];
           setProdutos(todosProdutos);
           setFilteredProdutos(todosProdutos); // Inicialmente, exibe todos os produtos
@@ -33,14 +33,14 @@ function RelatorioVendas() {
 
   useEffect(() => {
     const filtered = produtos.filter(produto => 
-      produto.Name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (produto.Size && typeof produto.Size === 'string' && produto.Size.toLowerCase().includes(searchTerm.toLowerCase()))
+      produto.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (produto.size && typeof produto.size === 'string' && produto.size.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredProdutos(filtered);
   }, [searchTerm, produtos]);  
 
   const calcularTotalVendido = () => {
-    return filteredProdutos.reduce((total, produto) => total + (produto.SoldAmount * produto.Price), 0).toFixed(2);
+    return filteredProdutos.reduce((total, produto) => total + (produto.soldAmount * produto.price), 0).toFixed(2);
   };
 
   return (
@@ -68,12 +68,12 @@ function RelatorioVendas() {
           </thead>
           <tbody>
             {filteredProdutos.map(produto => (
-              <tr key={produto.Id}>
-                <td>{produto.Name}</td>
-                <td>{produto.Size}</td>
-                <td>{produto.RemainingAmount}</td>
-                <td>{produto.SoldAmount}</td>
-                <td>R$ {(produto.SoldAmount * produto.Price).toFixed(2)}</td>
+              <tr key={produto.id}>
+                <td>{produto.name}</td>
+                <td>{produto.size}</td>
+                <td>{produto.remainingAmount}</td>
+                <td>{produto.soldAmount}</td>
+                <td>R$ {(produto.soldAmount * produto.price).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

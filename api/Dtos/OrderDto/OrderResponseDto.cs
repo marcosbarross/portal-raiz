@@ -1,7 +1,7 @@
 ﻿using api_raiz.Models;
 using System;
 
-namespace api_raiz.Dtos
+namespace api_raiz.Dtos.OrderDto
 {
     public class OrderResponseDto
     {
@@ -10,10 +10,10 @@ namespace api_raiz.Dtos
         public string ProductName { get; set; }
         public int Quantity { get; set; }
         public DateTime Date { get; set; }
-        public Double Price { get; set; }
-        public Double TotalPrice => Quantity * Price;
+        public double Price { get; set; }
+        public double TotalPrice => Quantity * Price;
 
-        public OrderResponseDto(int identificator, string studentName, string productName, int quantity, DateTime date, Double price)
+        public OrderResponseDto(int identificator, string studentName, string productName, int quantity, DateTime date, double price)
         {
             Identificator = identificator;
             StudentName = studentName;
