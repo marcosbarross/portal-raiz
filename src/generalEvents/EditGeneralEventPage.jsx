@@ -18,16 +18,16 @@ function EditGeneralEventPage() {
             .then(response => response.json())
             .then(data => {
                 setEvent(data);
-                setName(data.Name);
-                setInstallments(data.Installments);
-                setDate(new Date(data.Date).toISOString().split('T')[0]);
-                setTotalPrice(data.TotalPrice);
+                setName(data.name);
+                setInstallments(data.installments);
+                setDate(new Date(data.date).toISOString().split('T')[0]);
+                setTotalPrice(data.totalPrice);
             })
             .catch(error => console.error("Erro ao carregar detalhes do evento:", error));
     }, [id]);
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
         const updatedEvent = {
             name,
             installments: parseInt(installments),

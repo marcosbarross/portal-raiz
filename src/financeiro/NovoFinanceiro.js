@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function NovoFinanceiro() {
     const [nome, setNome] = useState('');
-    const [totalprice, setTotalPrice] = useState('');
+    const [totalPrice, setTotalPrice] = useState('');
     const [parcelas, setParcelas] = useState('');
     const [data, setData] = useState('');
     const [events, setEvents] = useState([]);
@@ -22,32 +22,17 @@ function NovoFinanceiro() {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get(`${getApiUrl()}/event/GetEvents`);
-            const eventsData = response.data.$values || [];
-    
-            const eventsWithGroups = await Promise.all(eventsData.map(async (event) => {
-                if (event.GroupId) {
-                    const groupResponse = await axios.get(`${getApiUrl()}/group/GetGroupDetail/${event.GroupId}`);
-                    return { ...event, Group: groupResponse.data };
-                }
-                return event;
-            }));
-    
-            setEvents(eventsWithGroups);
+            const response = await axios.get(`${getApiUrl()}/GeneralEvent/GetGeneralEvents`);
+            setEvents(response.data || []);
         } catch (error) {
             console.error('Erro ao carregar eventos:', error);
         }
     };
-    
 
     const fetchGroups = async () => {
         try {
-            const response = await axios.get(`${getApiUrl()}/group/GetGroups`);
-            if (Array.isArray(response.data.$values)) {
-                setGroups(response.data.$values);
-            } else {
-                console.error('Resposta inesperada da API', response.data);
-            }
+            const response = await axios.get(`${getApiUrl()}/Group/GetGroups`);
+            setGroups(response.data.$values || []);
         } catch (error) {
             console.error('Erro ao carregar grupos:', error);
         }
@@ -61,12 +46,12 @@ function NovoFinanceiro() {
             name: nome,
             installments: parseInt(parcelas),
             date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
-            TotalPrice: parseFloat(totalprice),
-            GroupId: parseInt(selectedGroup)
+            totalPrice: parseFloat(totalPrice),
+            groupId: parseInt(selectedGroup)
         };
 
         try {
-            await axios.post(`${getApiUrl()}/event/AddEvent`, evento);
+            await axios.post(`${getApiUrl()}/GeneralEvent/AddGeneralEvent`, evento);
             alert('Evento cadastrado com sucesso!');
             fetchEvents();
         } catch (error) {
@@ -77,7 +62,7 @@ function NovoFinanceiro() {
 
     const handleDetails = (id) => {
         navigate(`/DetalheEvento/${id}`);
-    };    
+    };
 
     return (
         <>
@@ -99,7 +84,7 @@ function NovoFinanceiro() {
                                 <Form.Label>Valor</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={totalprice}
+                                    value={totalPrice}
                                     onChange={(e) => setTotalPrice(e.target.value)}
                                 />
                             </Form.Group>
@@ -161,15 +146,15 @@ function NovoFinanceiro() {
                     </thead>
                     <tbody>
                         {events.map((event) => (
-                            <tr key={event.Id}>
-                                <td>{event.Id}</td>
-                                <td>{event.Name}</td>
-                                <td>{new Date(event.Date).toLocaleDateString()}</td>
-                                <td>{event.Installments}</td>
-                                <td>{event.TotalPrice}</td>
-                                <td>{event.Group ? `${event.Group.Name} (${event.Group.Level}, ${event.Group.Shift})` : 'Sem turma'}</td>
+                            <tr key={event.id}>
+                                <td>{event.id}</td>
+                                <td>{event.name}</td>
+                                <td>{new Date(event.date).toLocaleDateString()}</td>
+                                <td>{event.installments}</td>
+                                <td>{event.totalPrice}</td>
+                                <td>{event.group ? `${event.group.name} (${event.group.level}, ${event.group.shift})` : 'Sem turma'}</td>
                                 <td>
-                                    <Button variant="info" onClick={() => handleDetails(event.Id)}>
+                                    <Button variant="info" onClick={() => handleDetails(event.id)}>
                                         Detalhes
                                     </Button>
                                 </td>

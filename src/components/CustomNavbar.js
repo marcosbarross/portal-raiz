@@ -44,30 +44,30 @@ function CustomNavbar() {
           <Nav className="me-auto">
             <NavDropdown title="Menu de vendas" id="basic-nav-dropdown">
               <LinkContainer to="/itens">
-                <NavDropdown.Item>Adicionar item</NavDropdown.Item>
+                <NavDropdown.Item as="span">Adicionar item</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/vendas">
-                <NavDropdown.Item>Vender</NavDropdown.Item>
+                <NavDropdown.Item as="span">Vender</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/relatorio">
-                <NavDropdown.Item>Relatorio geral</NavDropdown.Item>
+                <NavDropdown.Item as="span">Relatorio geral</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/OrderList">
-                <NavDropdown.Item>Relatorio de pedidos</NavDropdown.Item>
+                <NavDropdown.Item as="span">Relatorio de pedidos</NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
 
             <NavDropdown title="Menu de eventos" id="basic-nav-dropdown">
               <LinkContainer to="/novoFinanceiro">
-                <NavDropdown.Item>Eventos por turma</NavDropdown.Item>
+                <NavDropdown.Item as="span">Eventos por turma</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/AddNewGeneralEventsPage">
-                <NavDropdown.Item>Eventos gerais</NavDropdown.Item>
+                <NavDropdown.Item as="span">Eventos gerais</NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
 
             <LinkContainer to="/geradorRecibos">
-              <Nav.Link>Gerador de recibos</Nav.Link>
+              <Nav.Link as="span">Gerador de recibos</Nav.Link>
             </LinkContainer>
           </Nav>
           {isLoggedIn ? (
@@ -76,7 +76,7 @@ function CustomNavbar() {
             </Button>
           ) : (
             <LinkContainer to="/">
-              <Nav.Link>Login</Nav.Link>
+              <Nav.Link as="span">Login</Nav.Link>
             </LinkContainer>
           )}
         </Navbar.Collapse>

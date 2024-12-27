@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Container, Table, Form, Button } from "react-bootstrap";
+import { Container, Table, Form, Button, Modal } from "react-bootstrap";
 import CustomNavbar from "../components/CustomNavbar";
 import getApiUrl from "../util/api";
 import { jsPDF } from "jspdf";
@@ -13,6 +13,8 @@ function StudentPaymentsPage() {
     const [receivedAmount, setReceivedAmount] = useState(0);
     const [change, setChange] = useState(0);
     const [studentName, setStudentName] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
 
     useEffect(() => {
         fetch(`${getApiUrl()}/Student/GetGeneralEventInstallments/${studentId}/${id}`)
@@ -22,7 +24,7 @@ function StudentPaymentsPage() {
                 }
                 return response.json();
             })
-            .then((data) => setInstallments(data.$values || []))
+            .then((data) => setInstallments(data || []))
             .catch((err) => setError(err.message));
 
         fetch(`${getApiUrl()}/Student/GetStudentName/${studentId}`)
@@ -37,10 +39,10 @@ function StudentPaymentsPage() {
     }, [id, studentId]);
 
     const calculateTotal = () => {
-        const unpaidInstallments = installments.filter((i) => !i.Paid);
+        const unpaidInstallments = installments.filter((i) => !i.paid);
         return unpaidInstallments
             .slice(0, selectedInstallments)
-            .reduce((total, installment) => total + (installment.Installment ?? 0), 0);
+            .reduce((total, installment) => total + (installment.installment ?? 0), 0);
     };
 
     const handleGerarPDF = () => {
@@ -65,27 +67,30 @@ function StudentPaymentsPage() {
         let yPos = 45;
         let total = 0;
     
-        const paidInstallments = installments.filter((i) => i.Paid);
+        installments
+            .filter((i) => i.paid)
+            .forEach((parcela) => {
+                yPos += 1;
+                const descricao = `${parcela.installmentNumber}ª parcela - Pago em: ${new Date(parcela.payDate).toLocaleDateString()}`;
+                const preco = `R$ ${(parcela.installment ?? 0).toFixed(2)}`;
+                pdf.text(descricao, 10, yPos);
+                yPos += 5;
+                pdf.text(preco, 10, yPos);
+                yPos += 2;
+                total += parcela.installment ?? 0;
+                pdf.line(5, yPos + 2, docWidth - 5, yPos + 2);
+                yPos += 6;
+            });
     
-        paidInstallments.forEach((parcela, index) => {
-            const descricao = `${parcela.InstallmentNumber}ª parcela - Pago em: ${new Date(parcela.PayDate).toLocaleDateString()}`;
-            const preco = `R$ ${(parcela.Installment ?? 0).toFixed(2)}`;
-            pdf.text(descricao, 10, yPos);
-            yPos += 5;
-            pdf.text(preco, 10, yPos);
-            yPos += 7;
-    
-            pdf.line(10, yPos - 5, 80, yPos - 5);
-            total += parcela.Installment ?? 0;
-        });
-    
-        pdf.text(`Total: R$ ${total.toFixed(2)}`, 10, yPos + 5);
-        pdf.text("Obrigado!", 10, yPos + 10);
+        yPos += 5;
+        pdf.text(`Total: R$ ${total.toFixed(2)}`, 10, yPos);
+        yPos += 5;
+        pdf.text("Obrigado!", 10, yPos + 5);
     
         const string = pdf.output("bloburl");
         window.open(string, "_blank");
     };
-    
+       
 
     const handlePayment = () => {
         const payload = {
@@ -93,7 +98,7 @@ function StudentPaymentsPage() {
             StudentId: studentId,
             InstallmentsToPay: selectedInstallments,
         };
-    
+
         fetch(`${getApiUrl()}/Student/PayGeneralEventInstallment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -103,12 +108,19 @@ function StudentPaymentsPage() {
                 if (!response.ok) {
                     throw new Error("Erro ao processar pagamento");
                 }
-                alert("Pagamento realizado com sucesso!");
+                setModalMessage("Pagamento realizado com sucesso!");
+                setShowModal(true);
+                setSelectedInstallments(0);
+                setReceivedAmount(0);
+                setChange(0);
                 window.location.reload();
             })
-            .catch((err) => alert(err.message));
+            .catch((err) => {
+                setModalMessage(err.message);
+                setShowModal(true);
+            });
     };
-    
+
     if (error) {
         return <p>Erro ao carregar dados: {error}</p>;
     }
@@ -135,9 +147,9 @@ function StudentPaymentsPage() {
                         {installments.map((installment, index) => (
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{installment.PayDate ? new Date(installment.PayDate).toLocaleDateString() : "N/A"}</td>
-                                <td>R$ {(installment.Installment ?? 0).toFixed(2)}</td>
-                                <td>{installment.Paid ? "Pago" : "Pendente"}</td>
+                                <td>{installment.payDate ? new Date(installment.payDate).toLocaleDateString() : "N/A"}</td>
+                                <td>R$ {(installment.installment ?? 0).toFixed(2)}</td>
+                                <td>{installment.paid ? "Pago" : "Pendente"}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -150,7 +162,7 @@ function StudentPaymentsPage() {
                     >
                         <option value={0}>Selecione...</option>
                         {Array.from(
-                            { length: installments.filter((i) => !i.Paid).length },
+                            { length: installments.filter((i) => !i.paid).length },
                             (_, i) => i + 1
                         ).map((value) => (
                             <option key={value} value={value}>
@@ -193,7 +205,18 @@ function StudentPaymentsPage() {
                     Gerar recibo
                 </Button>
             </Container>
-            <br />
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Aviso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{modalMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => setShowModal(false)}>
+                        Fechar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }

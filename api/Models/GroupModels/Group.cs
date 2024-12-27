@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using api_raiz.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_raiz.Models.GroupModels
@@ -34,6 +35,14 @@ namespace api_raiz.Models.GroupModels
             ShiftId = shiftId;
             GradeId = gradeId;
             LevelId = levelId;
+        }
+
+        public Group(GroupDto groupDto)
+        {
+            Name = groupDto.name;
+            ShiftId = groupDto.shiftId;
+            LevelId = groupDto.levelId;
+            GradeId = groupDto.gradeId;
         }
     }
 }

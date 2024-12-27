@@ -18,6 +18,9 @@ import EditGeneralEventPage from './generalEvents/EditGeneralEventPage.jsx';
 import EventDetailsPage from './generalEvents/EventDetailsPage';
 import StudentPaymentsPage from './generalEvents/StudentPaymentsPage.jsx'
 import OrderList from './pagesVendas/OrderList.jsx';
+import Shifts from './turmasPages/Shifts.jsx';
+import Levels from './turmasPages/Levels.jsx';
+import Grades from './turmasPages/Grades.jsx';
 
 const App = () => {
     return (
@@ -41,6 +44,10 @@ const App = () => {
                 <Route path="/ViewGeneralEvent/:id" element={<PrivateRoute element={<EventDetailsPage />} />} />
                 <Route path="/event/:id/student/:studentId/payments" element={<PrivateRoute element={<StudentPaymentsPage />}/>} />
                 <Route path="/OrderList" element={<PrivateRoute element={<OrderList />}/>} />
+                <Route path="/Shifts" element={<PrivateRoute element={<Shifts />}/>} />
+                <Route path="/Levels" element={<PrivateRoute element={<Levels />}/>} />
+                <Route path="/GradesDetalhes" element={<PrivateRoute element={<Grades />}/>} />
+
             </Routes>
         </Router>
     );

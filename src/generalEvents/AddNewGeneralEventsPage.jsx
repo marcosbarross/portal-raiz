@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, FloatingLabel, Form, Button, Table, Modal } from 'react-bootstrap';
+import { Container, FloatingLabel, Form, Button, Table, Modal, Alert, Spinner } from 'react-bootstrap';
 import CustomNavbar from "../components/CustomNavbar";
 import { useNavigate } from 'react-router-dom';
 import getApiUrl from '../util/api';
@@ -10,58 +10,69 @@ function GeneralEventsPage() {
     const [installments, setInstallments] = useState("");
     const [date, setDate] = useState("");
     const [totalPrice, setTotalPrice] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [eventIdToDelete, setEventIdToDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         loadGeneralEvents();
-    }, []);    
+    }, []);
 
-    const loadGeneralEvents = () => {
-        fetch(`${getApiUrl()}/GeneralEvent/GetGeneralEvents`)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data.$values)) {
-                    setGeneralEvents(data.$values);
-                } else {
-                    console.error("Resposta da API não é um array:", data);
-                }
-            })
-            .catch(error => console.error("Erro ao carregar eventos:", error));
+    const loadGeneralEvents = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await fetch(`${getApiUrl()}/GeneralEvent/GetGeneralEvents`);
+            const data = await response.json();
+            setGeneralEvents(data);
+        } catch (error) {
+            console.error("Erro ao carregar eventos:", error);
+            setError("Erro ao carregar eventos. Tente novamente.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (!name || !installments || !date || !totalPrice) {
+            setError("Por favor, preencha todos os campos.");
+            return;
+        }
+
         const newEvent = {
-            name: name,
+            name,
             installments: parseInt(installments),
-            date: date,
-            totalPrice: parseFloat(totalPrice)
+            date,
+            totalPrice: parseFloat(totalPrice),
         };
+
         try {
             const response = await fetch(`${getApiUrl()}/GeneralEvent/AddGeneralEvent`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(newEvent)
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newEvent),
             });
+
             if (response.ok) {
-                alert("Evento cadastrado com sucesso!");
-                // Limpar o formulário
+                setSuccess("Evento cadastrado com sucesso!");
                 setName("");
                 setInstallments("");
                 setDate("");
                 setTotalPrice("");
-                // Recarregar os eventos
                 loadGeneralEvents();
             } else {
-                alert("Erro ao cadastrar evento. Tente novamente.");
+                setError("Erro ao cadastrar evento. Tente novamente.");
             }
         } catch (error) {
             console.error("Erro ao cadastrar evento:", error);
-            alert("Erro ao cadastrar evento. Tente novamente.");
+            setError("Erro ao cadastrar evento. Tente novamente.");
         }
     };
 
@@ -70,127 +81,130 @@ function GeneralEventsPage() {
         setEventIdToDelete(id);
     };
 
-    const confirmDelete = () => {
-        fetch(`${getApiUrl()}/GeneralEvent/DeleteGeneralEvent/${eventIdToDelete}`, {
-            method: "DELETE"
-        })
-        .then(response => {
+    const confirmDelete = async () => {
+        setError("");
+        try {
+            const response = await fetch(`${getApiUrl()}/GeneralEvent/DeleteGeneralEvent/${eventIdToDelete}`, {
+                method: "DELETE",
+            });
+
             if (response.ok) {
                 setShowModal(false);
-                // Recarregar os eventos após a exclusão
                 loadGeneralEvents();
             } else {
-                alert("Erro ao excluir evento. Tente novamente.");
+                setError("Erro ao excluir evento. Tente novamente.");
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error("Erro ao excluir evento:", error);
-            alert("Erro ao excluir evento. Tente novamente.");
-        });
+            setError("Erro ao excluir evento. Tente novamente.");
+        }
     };
 
     return (
         <>
-        <CustomNavbar />
-   
-        <Container className="mb-3">
-            <br />
-            <h3>Cadastrar novo evento geral</h3>
-            <Form onSubmit={handleSubmit}>
-                <FloatingLabel
-                    controlId="floatingInput"
-                    label="Nome do evento"
-                    className="mb-3"
-                >
-                    <Form.Control 
-                        type="text" 
-                        placeholder="Nome do evento" 
-                        value={name}
-                        onChange={(e) => setName(e.target.value)} 
-                    />
-                </FloatingLabel>
-                <FloatingLabel
-                    controlId="floatingInput"
-                    label="Parcelas"
-                    className="mb-3"
-                >
-                    <Form.Control 
-                        type="number" 
-                        placeholder="Parcelas" 
-                        value={installments}
-                        onChange={(e) => setInstallments(e.target.value)} 
-                    />
-                </FloatingLabel>
-                <FloatingLabel
-                    controlId="floatingInput"
-                    label="Data"
-                    className="mb-3"
-                >
-                    <Form.Control 
-                        type="date" 
-                        placeholder="Data" 
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)} 
-                    />
-                </FloatingLabel>
-                <FloatingLabel
-                    controlId="floatingInput"
-                    label="Preço Total"
-                    className="mb-3"
-                >
-                    <Form.Control 
-                        type="number" 
-                        step="0.01"
-                        placeholder="Preço Total" 
-                        value={totalPrice}
-                        onChange={(e) => setTotalPrice(e.target.value)} 
-                    />
-                </FloatingLabel>
-                <Button variant="primary" type="submit">
-                    Cadastrar
-                </Button>
-            </Form>
+            <CustomNavbar />
 
-            <br />
-            <h3>Eventos gerais</h3>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Valor Total</th>
-                        <th>Parcelas</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {generalEvents.map(event => (
-                        <tr key={event.Id}>
-                            <td>{event.Id}</td>
-                            <td>{event.Name}</td>
-                            <td>{event.TotalPrice}</td>
-                            <td>{event.Installments}</td>
-                            <td>
-                                <Button variant="info" onClick={() => navigate(`/ViewGeneralEvent/${event.Id}`)}>Acessar</Button>{' '}
-                                <Button variant="warning" onClick={() => navigate(`/EditGeneralEvent/${event.Id}`)}>Editar</Button>{' '}
-                                <Button variant="danger" onClick={() => handleDelete(event.Id)}>Excluir</Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
-        </Container>
+            <Container className="mb-3">
+                <br />
+                <h3>Cadastrar novo evento geral</h3>
 
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
-            <Modal.Header closeButton>
-                <Modal.Title>Confirmar Exclusão</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>Tem certeza de que deseja excluir este evento?</Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-                <Button variant="danger" onClick={confirmDelete}>Excluir</Button>
-            </Modal.Footer>
-        </Modal>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {success && <Alert variant="success">{success}</Alert>}
+
+                <Form onSubmit={handleSubmit}>
+                    <FloatingLabel controlId="floatingInput" label="Nome do evento" className="mb-3">
+                        <Form.Control
+                            type="text"
+                            placeholder="Nome do evento"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    <FloatingLabel controlId="floatingInput" label="Parcelas" className="mb-3">
+                        <Form.Control
+                            type="number"
+                            placeholder="Parcelas"
+                            value={installments}
+                            onChange={(e) => setInstallments(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    <FloatingLabel controlId="floatingInput" label="Data" className="mb-3">
+                        <Form.Control
+                            type="date"
+                            placeholder="Data"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    <FloatingLabel controlId="floatingInput" label="Preço Total" className="mb-3">
+                        <Form.Control
+                            type="number"
+                            step="0.01"
+                            placeholder="Preço Total"
+                            value={totalPrice}
+                            onChange={(e) => setTotalPrice(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    <Button variant="primary" type="submit">
+                        Cadastrar
+                    </Button>
+                </Form>
+
+                <br />
+                <h3>Eventos gerais</h3>
+
+                {loading ? (
+                    <Spinner animation="border" />
+                ) : (
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Valor Total</th>
+                                <th>Parcelas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {generalEvents.map((event) => (
+                                <tr key={event.id}>
+                                    <td>{event.id}</td>
+                                    <td>{event.name}</td>
+                                    <td>{event.totalPrice}</td>
+                                    <td>{event.installments}</td>
+                                    <td>
+                                        <Button variant="info" onClick={() => navigate(`/ViewGeneralEvent/${event.id}`)}>
+                                            Acessar
+                                        </Button>{' '}
+                                        <Button variant="warning" onClick={() => navigate(`/EditGeneralEvent/${event.id}`)}>
+                                            Editar
+                                        </Button>{' '}
+                                        <Button variant="danger" onClick={() => handleDelete(event.id)}>
+                                            Excluir
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                )}
+            </Container>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Exclusão</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Tem certeza de que deseja excluir este evento?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Excluir
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }

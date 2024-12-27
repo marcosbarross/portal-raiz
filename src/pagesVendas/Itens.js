@@ -17,19 +17,25 @@ function Itens() {
   useEffect(() => {
     loadProdutos();
   }, []);
-
+  
   const loadProdutos = () => {
     axios.get(`${getApiUrl()}/Product/GetProducts`)
       .then(response => {
-        if (response.data && response.data.Products && response.data.Products.$values) {
-          const produtosNormais = response.data.Products.$values.map(produto => ({
-            ...produto,
-            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
+        if (response.data) {
+          const produtosNormais = response.data.products.map(produto => ({
+            id: produto.id,
+            name: produto.name,
+            size: produto.size,
+            price: produto.price,
+            remainingAmount: produto.remainingAmount
           }));
-          const produtosAlternativos = response.data.ProductsAlternativeSize ? response.data.ProductsAlternativeSize.$values.map(produto => ({
-            ...produto,
-            Size: produto.Size ? produto.Size.toString() : '' // Normaliza Size para string
-          })) : [];
+          const produtosAlternativos = response.data.productsAlternativeSize.map(produto => ({
+            id: produto.id,
+            name: produto.name,
+            size: produto.size,
+            price: produto.price,
+            remainingAmount: produto.remainingAmount
+          }));
           setProdutos([...produtosNormais, ...produtosAlternativos]);
         } else {
           console.error('API response is not in expected format:', response.data);
@@ -64,7 +70,7 @@ function Itens() {
 
   const handleDeleteProduto = () => {
     if (produtoToDelete) {
-      axios.delete(`${getApiUrl()}/Product/DeleteProduct/${produtoToDelete.Id}`)
+      axios.delete(`${getApiUrl()}/Product/DeleteProduct/${produtoToDelete.id}`) // aqui é "id"
         .then(() => {
           loadProdutos();
           handleCloseModal();
@@ -72,6 +78,7 @@ function Itens() {
         .catch(error => console.error('Error deleting product:', error));
     }
   };
+  
 
   const handleShowModal = (produto) => {
     setProdutoToDelete(produto);
@@ -84,9 +91,10 @@ function Itens() {
   };
 
   const produtosFiltrados = produtos.filter(produto => (
-    produto.Name?.toLowerCase().includes(busca.toLowerCase()) ||
-    (produto.Size && produto.Size.toLowerCase().includes(busca.toLowerCase()))
+    produto.name?.toLowerCase().includes(busca.toLowerCase()) ||
+    (produto.size && produto.size.toString().toLowerCase().includes(busca.toLowerCase()))
   ));
+  
 
   return (
     <>
@@ -108,10 +116,24 @@ function Itens() {
           </Form.Group>
           <Form.Group>
             <Form.Label>Tamanho</Form.Label>
+  
             <Form.Select aria-label="Tamanho" value={tamanho} onChange={(e) => setTamanho(e.target.value)} required>
               <option value="">Selecione o tamanho...</option>
-              {/* Adicione os valores de tamanho aqui */}
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="14">14</option>
+              <option value="16">16</option>
+              <option value="18">PP</option>
+              <option value="20">P</option>
+              <option value="22">M</option>
+              <option value="24">G</option>
+              <option value="26">GG</option>
             </Form.Select>
+
           </Form.Group>
           <Button type="submit" className="mt-3">Adicionar produto</Button>
         </Form>
@@ -139,11 +161,11 @@ function Itens() {
           </thead>
           <tbody>
             {produtosFiltrados.map(produto => (
-              <tr key={produto.Id}>
-                <td>{produto.Name}</td>
-                <td>{produto.Price}</td>
-                <td>{produto.Size}</td>
-                <td>{produto.RemainingAmount}</td>
+              <tr key={produto.id}>
+                <td>{produto.name}</td>
+                <td>{produto.price}</td>
+                <td>{produto.size}</td>
+                <td>{produto.remainingAmount}</td>
                 <td>
                   <Button variant="danger" onClick={() => handleShowModal(produto)}>Excluir</Button>
                 </td>
@@ -158,7 +180,7 @@ function Itens() {
           <Modal.Title>Confirmação</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Tem certeza que deseja excluir o produto "{produtoToDelete?.Name}"?
+          Tem certeza que deseja excluir o produto "{produtoToDelete?.name}"?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
