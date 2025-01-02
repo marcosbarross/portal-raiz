@@ -1,5 +1,14 @@
 import React from 'react';
-import { Nav, Container, Row, Col, Button, Card, Dropdown, DropdownButton } from 'react-bootstrap';
+import {
+  Nav,
+  Container,
+  Row,
+  Col,
+  Button,
+  Card,
+  Dropdown,
+  DropdownButton,
+} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import CustomNavbar from '../components/CustomNavbar';
 import './Home.css';
@@ -12,15 +21,15 @@ function Home() {
         <Row>
           <Col md={6} lg={4} className="mb-4">
             <Card>
-              <Card.Img 
-                variant="top" 
-                src={require('./taxa.png')} 
+              <Card.Img
+                variant="top"
+                src={require('./taxa.png')}
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
                 <Card.Title>Gerador de recibos</Card.Title>
                 <Button variant="primary">
-                  <LinkContainer to={"/geradorRecibos"}>
+                  <LinkContainer to={'/geradorRecibos'}>
                     <Nav.Link>Abrir</Nav.Link>
                   </LinkContainer>
                 </Button>
@@ -30,31 +39,31 @@ function Home() {
 
           <Col md={6} lg={4} className="mb-4">
             <Card>
-              <Card.Img 
-                variant="top" 
-                src={require('./mao.png')} 
+              <Card.Img
+                variant="top"
+                src={require('./mao.png')}
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
-
                 <Card.Title>Fardamentos</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
-                    <LinkContainer to={"/itens"}>
+                    <LinkContainer to={'/itens'}>
                       <Nav.Link>Ver fardamentos</Nav.Link>
-                    </LinkContainer></Dropdown.Item>
+                    </LinkContainer>
+                  </Dropdown.Item>
                   <Dropdown.Item>
-                    <LinkContainer to={"/vendas"}>
+                    <LinkContainer to={'/vendas'}>
                       <Nav.Link>Vender fardamentos</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
                   <Dropdown.Item>
-                    <LinkContainer to={"/relatorio"}>
+                    <LinkContainer to={'/relatorio'}>
                       <Nav.Link>Relatório geral</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
                   <Dropdown.Item>
-                    <LinkContainer to={"/OrderList"}>
+                    <LinkContainer to={'/OrderList'}>
                       <Nav.Link>Relatório de pedidos</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
@@ -65,20 +74,21 @@ function Home() {
 
           <Col md={6} lg={4} className="mb-4">
             <Card>
-              <Card.Img 
-                variant="top" 
-                src={require('./dinheiro.png')} 
+              <Card.Img
+                variant="top"
+                src={require('./dinheiro.png')}
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
                 <Card.Title>Eventos</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
-                    <LinkContainer to={"/NovoFinanceiro"}>
+                    <LinkContainer to={'/NovoFinanceiro'}>
                       <Nav.Link>Eventos de turma</Nav.Link>
-                    </LinkContainer></Dropdown.Item>
+                    </LinkContainer>
+                  </Dropdown.Item>
                   <Dropdown.Item>
-                    <LinkContainer to={"/AddNewGeneralEventsPage"}>
+                    <LinkContainer to={'/AddNewGeneralEventsPage'}>
                       <Nav.Link>Eventos gerais</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
@@ -89,15 +99,15 @@ function Home() {
 
           <Col md={6} lg={4} className="mb-4">
             <Card>
-              <Card.Img 
-                variant="top" 
-                src={require('./aluna.png')} 
+              <Card.Img
+                variant="top"
+                src={require('./aluna.png')}
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
                 <Card.Title>Painel de alunos</Card.Title>
                 <Button variant="primary">
-                  <LinkContainer to={"/AddAlunos"}>
+                  <LinkContainer to={'/AddAlunos'}>
                     <Nav.Link>Abrir</Nav.Link>
                   </LinkContainer>
                 </Button>
@@ -107,33 +117,34 @@ function Home() {
 
           <Col md={6} lg={4} className="mb-4">
             <Card>
-              <Card.Img 
-                variant="top" 
-                src={require('./encontro.png')} 
+              <Card.Img
+                variant="top"
+                src={require('./encontro.png')}
                 className="card-img-limited"
               />
               <Card.Body className="text-center">
                 <Card.Title>Painel de turmas</Card.Title>
                 <DropdownButton id="dropdown-basic-button" title="Abrir como">
                   <Dropdown.Item>
-                    <LinkContainer to={"/Turmas"}>
+                    <LinkContainer to={'/Turmas'}>
                       <Nav.Link>Ver turmas</Nav.Link>
-                    </LinkContainer></Dropdown.Item>
+                    </LinkContainer>
+                  </Dropdown.Item>
 
                   <Dropdown.Item>
-                    <LinkContainer to={"/Grades"}>
+                    <LinkContainer to={'/Grades'}>
                       <Nav.Link>Ver séries</Nav.Link>
                     </LinkContainer>
-                  </Dropdown.Item>  
+                  </Dropdown.Item>
 
                   <Dropdown.Item>
-                    <LinkContainer to={"/Levels"}>
+                    <LinkContainer to={'/Levels'}>
                       <Nav.Link>Ver níveis</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>
 
                   <Dropdown.Item>
-                    <LinkContainer to={"/Shifts"}>
+                    <LinkContainer to={'/Shifts'}>
                       <Nav.Link>Ver turnos</Nav.Link>
                     </LinkContainer>
                   </Dropdown.Item>

@@ -9,7 +9,9 @@ function PrivateRoute({ element }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, { withCredentials: true });
+        await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, {
+          withCredentials: true,
+        });
         setIsAuthenticated(true);
       } catch (error) {
         setIsAuthenticated(false);

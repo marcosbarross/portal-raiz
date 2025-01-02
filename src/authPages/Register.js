@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Button, Form, Row, Col } from "react-bootstrap";
+import { Container, Button, Form, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import getApiUrl from '../util/api';
 
@@ -19,7 +19,7 @@ function Register() {
       );
       setMessage(response.data.message);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Erro ao fazer cadastro");
+      setMessage(error.response?.data?.message || 'Erro ao fazer cadastro');
     }
   };
 

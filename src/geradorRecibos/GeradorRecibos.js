@@ -21,16 +21,22 @@ function GeradorRecibos() {
   const handleGerarPDF = () => {
     const pdf = new jsPDF({
       unit: 'mm',
-      format: [80, 297]
+      format: [80, 297],
     });
 
     const docWidth = pdf.internal.pageSize.getWidth();
 
     pdf.setFontSize(6);
 
-    pdf.text('EDUCANDÁRIO RAIZ DO SABER', docWidth / 2, 10, { align: 'center' });
-    pdf.text('Rua Francisco do Rego Moraes Barros', docWidth / 2, 12, { align: 'center' });
-    pdf.text('Engenho Maranguape - Paulista - PE', docWidth / 2, 14, { align: 'center' });
+    pdf.text('EDUCANDÁRIO RAIZ DO SABER', docWidth / 2, 10, {
+      align: 'center',
+    });
+    pdf.text('Rua Francisco do Rego Moraes Barros', docWidth / 2, 12, {
+      align: 'center',
+    });
+    pdf.text('Engenho Maranguape - Paulista - PE', docWidth / 2, 14, {
+      align: 'center',
+    });
     pdf.text('CNPJ: 03.511.401.0001-02', docWidth / 2, 16, { align: 'center' });
 
     pdf.setFontSize(10);
@@ -68,25 +74,68 @@ function GeradorRecibos() {
         <h1>Recibo de pagamento</h1>
         <form>
           <div className="mb-3">
-            <label htmlFor="nome" className="form-label">Nome:</label>
-            <input type="text" className="form-control" id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+            <label htmlFor="nome" className="form-label">
+              Nome:
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
           </div>
           {produtos.map((produto, index) => (
-              <div key={index}>
-                <div className="mb-3">
-                  <label htmlFor={`produto${index + 1}`} className="form-label">Produto:</label>
-                  <input type="text" className="form-control" id={`produto${index + 1}`} value={produto.nome} onChange={(e) => handleProdutoChange(index, 'nome', e.target.value)} />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor={`valorProduto${index + 1}`} className="form-label">Valor Produto:</label>
-                  <input type="text" className="form-control" id={`valorProduto${index + 1}`} value={produto.valor} onChange={(e) => handleProdutoChange(index, 'valor', e.target.value)} />
-                </div>
+            <div key={index}>
+              <div className="mb-3">
+                <label htmlFor={`produto${index + 1}`} className="form-label">
+                  Produto:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`produto${index + 1}`}
+                  value={produto.nome}
+                  onChange={(e) =>
+                    handleProdutoChange(index, 'nome', e.target.value)
+                  }
+                />
               </div>
+              <div className="mb-3">
+                <label
+                  htmlFor={`valorProduto${index + 1}`}
+                  className="form-label"
+                >
+                  Valor Produto:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`valorProduto${index + 1}`}
+                  value={produto.valor}
+                  onChange={(e) =>
+                    handleProdutoChange(index, 'valor', e.target.value)
+                  }
+                />
+              </div>
+            </div>
           ))}
-          <button type="button" className="btn btn-primary" onClick={handleAddProduto}>Adicionar Produto</button>
-          <br/>
-          <br/>
-          <button type="button" className="btn btn-success" onClick={handleGerarPDF}>Gerar PDF</button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleAddProduto}
+          >
+            Adicionar Produto
+          </button>
+          <br />
+          <br />
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={handleGerarPDF}
+          >
+            Gerar PDF
+          </button>
         </form>
       </div>
     </>

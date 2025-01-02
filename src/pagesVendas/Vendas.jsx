@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Row, Col, Table, Modal } from 'react-bootstrap';
+import {
+  Container,
+  Form,
+  Button,
+  Row,
+  Col,
+  Table,
+  Modal,
+} from 'react-bootstrap';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import CustomNavbar from '../components/CustomNavbar';
@@ -20,15 +28,16 @@ function Vendas() {
   const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
-    axios.get(`${getApiUrl()}/Product/GetProducts`)
-      .then(response => {
+    axios
+      .get(`${getApiUrl()}/Product/GetProducts`)
+      .then((response) => {
         const allProducts = [
           ...(response.data.products || []),
           ...(response.data.productsAlternativeSize || []),
         ];
         setProdutos(allProducts);
       })
-      .catch(error => console.error('Erro ao carregar produtos:', error));
+      .catch((error) => console.error('Erro ao carregar produtos:', error));
   }, []);
 
   useEffect(() => {
@@ -46,23 +55,30 @@ function Vendas() {
 
   const handleAddItem = (e) => {
     e.preventDefault();
-    const produto = produtos.find(p => p.id === parseInt(produtoId));
+    const produto = produtos.find((p) => p.id === parseInt(produtoId));
     if (produto) {
-      const itemExistente = itensPedido.find(item => item.productId === produto.id);
+      const itemExistente = itensPedido.find(
+        (item) => item.productId === produto.id
+      );
       if (itemExistente) {
-        setItensPedido(itensPedido.map(item =>
-          item.productId === produto.id
-            ? { ...item, quantity: item.quantity + parseInt(quantidade) }
-            : item
-        ));
+        setItensPedido(
+          itensPedido.map((item) =>
+            item.productId === produto.id
+              ? { ...item, quantity: item.quantity + parseInt(quantidade) }
+              : item
+          )
+        );
       } else {
-        setItensPedido([...itensPedido, {
-          productId: produto.id,
-          productSize: produto.size,
-          quantity: parseInt(quantidade),
-          productName: produto.name,
-          productPrice: produto.price,
-        }]);
+        setItensPedido([
+          ...itensPedido,
+          {
+            productId: produto.id,
+            productSize: produto.size,
+            quantity: parseInt(quantidade),
+            productName: produto.name,
+            productPrice: produto.price,
+          },
+        ]);
       }
       setProdutoId('');
       setQuantidade('');
@@ -70,7 +86,10 @@ function Vendas() {
   };
 
   const calcularTotalPedido = () => {
-    const total = itensPedido.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
+    const total = itensPedido.reduce(
+      (sum, item) => sum + item.productPrice * item.quantity,
+      0
+    );
     setTotalPedido(total);
   };
 
@@ -78,7 +97,7 @@ function Vendas() {
 
   const handleSubmitPedido = () => {
     if (!selectedStudent) {
-      setModalMessage("Selecione um aluno antes de finalizar o pedido.");
+      setModalMessage('Selecione um aluno antes de finalizar o pedido.');
       setShowModal(true);
       return;
     }
@@ -99,16 +118,18 @@ function Vendas() {
         .post(`${getApiUrl()}/Product/SellProduct`, orderItems)
         .then(() => {
           setItensPedido([]);
-          setModalMessage("Pedido realizado com sucesso!");
+          setModalMessage('Pedido realizado com sucesso!');
           setShowModal(true);
         })
         .catch((error) => {
-          console.error("Erro ao enviar pedido:", error);
-          setModalMessage("Ocorreu um erro ao enviar o pedido. Verifique os logs.");
+          console.error('Erro ao enviar pedido:', error);
+          setModalMessage(
+            'Ocorreu um erro ao enviar o pedido. Verifique os logs.'
+          );
           setShowModal(true);
         });
     } else {
-      setModalMessage("Valor pago insuficiente.");
+      setModalMessage('Valor pago insuficiente.');
       setShowModal(true);
     }
   };
@@ -126,9 +147,14 @@ function Vendas() {
           <h2>Selecione o produto: </h2>
           <Form.Group>
             <Form.Label>Produto</Form.Label>
-            <Form.Control as="select" value={produtoId} onChange={(e) => setProdutoId(e.target.value)} required>
+            <Form.Control
+              as="select"
+              value={produtoId}
+              onChange={(e) => setProdutoId(e.target.value)}
+              required
+            >
               <option value="">Selecione um produto</option>
-              {produtos.map(produto => (
+              {produtos.map((produto) => (
                 <option key={produto.id} value={produto.id}>
                   {`${produto.name}, tamanho: ${produto.size}`}
                 </option>
@@ -137,9 +163,16 @@ function Vendas() {
           </Form.Group>
           <Form.Group>
             <Form.Label>Quantidade</Form.Label>
-            <Form.Control type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required />
+            <Form.Control
+              type="number"
+              value={quantidade}
+              onChange={(e) => setQuantidade(e.target.value)}
+              required
+            />
           </Form.Group>
-          <Button type="submit" className="mt-3">Adicionar ao pedido</Button>
+          <Button type="submit" className="mt-3">
+            Adicionar ao pedido
+          </Button>
         </Form>
         <hr />
         <h2 className="mt-5">Itens do pedido</h2>
@@ -155,7 +188,7 @@ function Vendas() {
             </tr>
           </thead>
           <tbody>
-            {itensPedido.map(item => (
+            {itensPedido.map((item) => (
               <tr key={item.productId}>
                 <td>{item.productName}</td>
                 <td>{item.productSize}</td>
@@ -166,7 +199,13 @@ function Vendas() {
                   <Button
                     size="sm"
                     variant="danger"
-                    onClick={() => setItensPedido(itensPedido.filter(i => i.productId !== item.productId))}
+                    onClick={() =>
+                      setItensPedido(
+                        itensPedido.filter(
+                          (i) => i.productId !== item.productId
+                        )
+                      )
+                    }
                   >
                     Remover
                   </Button>
@@ -183,7 +222,11 @@ function Vendas() {
           <Col>
             <Form.Group>
               <Form.Label>Valor pago</Form.Label>
-              <Form.Control type="number" value={valorPago} onChange={(e) => setValorPago(Number(e.target.value))} />
+              <Form.Control
+                type="number"
+                value={valorPago}
+                onChange={(e) => setValorPago(Number(e.target.value))}
+              />
             </Form.Group>
           </Col>
           <Col>
@@ -213,9 +256,7 @@ function Vendas() {
         <Modal.Header closeButton>
           <Modal.Title>Informação</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {modalMessage}
-        </Modal.Body>
+        <Modal.Body>{modalMessage}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Fechar

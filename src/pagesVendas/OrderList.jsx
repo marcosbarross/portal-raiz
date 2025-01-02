@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Container, Row, Col, Form } from 'react-bootstrap';
+import {
+  Table,
+  Button,
+  Modal,
+  Container,
+  Row,
+  Col,
+  Form,
+} from 'react-bootstrap';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import getApiUrl from '../util/api';
@@ -14,27 +22,30 @@ const OrderList = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    axios.get(`${getApiUrl()}/Order/GetOrders`)
-      .then(response => {
+    axios
+      .get(`${getApiUrl()}/Order/GetOrders`)
+      .then((response) => {
         if (response.data) {
           setOrders(response.data); // Ajuste para lidar com o array direto
         } else {
           console.error('Resposta inesperada da API:', response.data);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Erro ao buscar pedidos:', error);
       });
   }, []);
 
   useEffect(() => {
     const grouped = orders.reduce((acc, order) => {
-      const existingOrder = acc.find(o => o.identificator === order.identificator);
+      const existingOrder = acc.find(
+        (o) => o.identificator === order.identificator
+      );
       if (existingOrder) {
         existingOrder.products.push({
           productName: order.productName,
           quantity: order.quantity,
-          price: order.price
+          price: order.price,
         });
         existingOrder.totalQuantity += order.quantity;
         existingOrder.totalPrice += order.quantity * order.price;
@@ -45,11 +56,13 @@ const OrderList = () => {
           date: order.date,
           totalQuantity: order.quantity,
           totalPrice: order.quantity * order.price,
-          products: [{
-            productName: order.productName,
-            quantity: order.quantity,
-            price: order.price
-          }]
+          products: [
+            {
+              productName: order.productName,
+              quantity: order.quantity,
+              price: order.price,
+            },
+          ],
         });
       }
       return acc;
@@ -59,9 +72,10 @@ const OrderList = () => {
   }, [orders]);
 
   useEffect(() => {
-    const filtered = groupedOrders.filter(order =>
-      order.identificator.toString().includes(searchTerm) ||
-      order.studentName.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = groupedOrders.filter(
+      (order) =>
+        order.identificator.toString().includes(searchTerm) ||
+        order.studentName.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredOrders(filtered);
   }, [searchTerm, groupedOrders]);
@@ -80,7 +94,7 @@ const OrderList = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: [80, 130]
+      format: [80, 130],
     });
 
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -90,14 +104,22 @@ const OrderList = () => {
     let columnWidth = 18;
 
     doc.setFontSize(8);
-    doc.text('EDUCANDÁRIO RAIZ DO SABER', pageWidth / 2, startY, { align: 'center' });
+    doc.text('EDUCANDÁRIO RAIZ DO SABER', pageWidth / 2, startY, {
+      align: 'center',
+    });
     startY += lineHeight;
-    doc.text('Rua Francisco do Rego Moraes Barros', pageWidth / 2, startY, { align: 'center' });
+    doc.text('Rua Francisco do Rego Moraes Barros', pageWidth / 2, startY, {
+      align: 'center',
+    });
     startY += lineHeight;
-    doc.text('Engenho Maranguape - Paulista - PE', pageWidth / 2, startY, { align: 'center' });
+    doc.text('Engenho Maranguape - Paulista - PE', pageWidth / 2, startY, {
+      align: 'center',
+    });
     startY += lineHeight;
-    doc.text('CNPJ: 03.511.401.0001-02', pageWidth / 2, startY, { align: 'center' });
-    startY += lineHeight *2;
+    doc.text('CNPJ: 03.511.401.0001-02', pageWidth / 2, startY, {
+      align: 'center',
+    });
+    startY += lineHeight * 2;
 
     doc.setFontSize(10);
     doc.text('RECIBO DE COMPRA', pageWidth / 2, startY, { align: 'center' });
@@ -171,14 +193,19 @@ const OrderList = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map(order => (
+                {filteredOrders.map((order) => (
                   <tr key={order.identificator}>
                     <td>{order.identificator}</td>
                     <td>{order.studentName}</td>
                     <td>{new Date(order.date).toLocaleString()}</td>
                     <td>{`R$ ${order.totalPrice.toFixed(2)}`}</td>
                     <td>
-                      <Button variant="info" onClick={() => handleShowDetails(order)}>Detalhes</Button>
+                      <Button
+                        variant="info"
+                        onClick={() => handleShowDetails(order)}
+                      >
+                        Detalhes
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -194,16 +221,34 @@ const OrderList = () => {
           <Modal.Body>
             {selectedOrder && (
               <div>
-                <p><strong>Número do pedido:</strong> {selectedOrder.identificator}</p>
-                <p><strong>Nome do estudante:</strong> {selectedOrder.studentName}</p>
-                <p><strong>Data:</strong> {new Date(selectedOrder.date).toLocaleString()}</p>
-                <p><strong>Quantidade total dos produtos:</strong> {selectedOrder.totalQuantity}</p>
-                <p><strong>Preço total:</strong> {selectedOrder.totalPrice.toFixed(2)}</p>
-                <p><strong>Produtos:</strong></p>
+                <p>
+                  <strong>Número do pedido:</strong>{' '}
+                  {selectedOrder.identificator}
+                </p>
+                <p>
+                  <strong>Nome do estudante:</strong>{' '}
+                  {selectedOrder.studentName}
+                </p>
+                <p>
+                  <strong>Data:</strong>{' '}
+                  {new Date(selectedOrder.date).toLocaleString()}
+                </p>
+                <p>
+                  <strong>Quantidade total dos produtos:</strong>{' '}
+                  {selectedOrder.totalQuantity}
+                </p>
+                <p>
+                  <strong>Preço total:</strong>{' '}
+                  {selectedOrder.totalPrice.toFixed(2)}
+                </p>
+                <p>
+                  <strong>Produtos:</strong>
+                </p>
                 <ul>
                   {selectedOrder.products.map((product, index) => (
                     <li key={index}>
-                      {product.productName} - {product.quantity} x {product.price.toFixed(2)}
+                      {product.productName} - {product.quantity} x{' '}
+                      {product.price.toFixed(2)}
                     </li>
                   ))}
                 </ul>
@@ -211,9 +256,14 @@ const OrderList = () => {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>Fechar</Button>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Fechar
+            </Button>
             {selectedOrder && (
-              <Button variant="primary" onClick={() => generateReceipt(selectedOrder)}>
+              <Button
+                variant="primary"
+                onClick={() => generateReceipt(selectedOrder)}
+              >
                 Gerar Recibo
               </Button>
             )}

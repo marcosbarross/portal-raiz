@@ -10,21 +10,26 @@ function RelatorioVendas() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const carregarProdutos = useCallback(() => {
-    axios.get(`${getApiUrl()}/Product/GetProducts`)
-      .then(response => {
+    axios
+      .get(`${getApiUrl()}/Product/GetProducts`)
+      .then((response) => {
         if (response.data && response.data.products) {
           const produtosNormais = response.data.products;
-          const produtosAlternativos = response.data.productsAlternativeSize || [];
+          const produtosAlternativos =
+            response.data.productsAlternativeSize || [];
           const todosProdutos = [...produtosNormais, ...produtosAlternativos];
           setProdutos(todosProdutos);
           setFilteredProdutos(todosProdutos); // Inicialmente, exibe todos os produtos
         } else {
-          console.error('API response is not in expected format:', response.data);
+          console.error(
+            'API response is not in expected format:',
+            response.data
+          );
           setProdutos([]);
           setFilteredProdutos([]);
         }
       })
-      .catch(error => console.error('Error loading products:', error));
+      .catch((error) => console.error('Error loading products:', error));
   }, []);
 
   useEffect(() => {
@@ -32,15 +37,20 @@ function RelatorioVendas() {
   }, [carregarProdutos]);
 
   useEffect(() => {
-    const filtered = produtos.filter(produto => 
-      produto.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (produto.size && typeof produto.size === 'string' && produto.size.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = produtos.filter(
+      (produto) =>
+        produto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (produto.size &&
+          typeof produto.size === 'string' &&
+          produto.size.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredProdutos(filtered);
-  }, [searchTerm, produtos]);  
+  }, [searchTerm, produtos]);
 
   const calcularTotalVendido = () => {
-    return filteredProdutos.reduce((total, produto) => total + (produto.soldAmount * produto.price), 0).toFixed(2);
+    return filteredProdutos
+      .reduce((total, produto) => total + produto.soldAmount * produto.price, 0)
+      .toFixed(2);
   };
 
   return (
@@ -67,7 +77,7 @@ function RelatorioVendas() {
             </tr>
           </thead>
           <tbody>
-            {filteredProdutos.map(produto => (
+            {filteredProdutos.map((produto) => (
               <tr key={produto.id}>
                 <td>{produto.name}</td>
                 <td>{produto.size}</td>
@@ -78,7 +88,9 @@ function RelatorioVendas() {
             ))}
           </tbody>
         </Table>
-        <h4 className="mt-4">Total geral vendido: R$ {calcularTotalVendido()}</h4>
+        <h4 className="mt-4">
+          Total geral vendido: R$ {calcularTotalVendido()}
+        </h4>
       </Container>
     </>
   );
