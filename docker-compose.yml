@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - '80:80'
     depends_on:
       - api
     volumes:
@@ -17,7 +17,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -35,7 +35,7 @@ services:
       POSTGRES_USER: raiz
       POSTGRES_PASSWORD: FkYKkhgrxyo8qbz1EcOxvSa2hNB5rPDk
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
 

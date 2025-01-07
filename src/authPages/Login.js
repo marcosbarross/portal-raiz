@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Form, Row, Col } from "react-bootstrap";
+import { Container, Button, Form, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import getApiUrl from '../util/api';
@@ -13,8 +13,10 @@ function Login() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, { withCredentials: true });
-        navigate("/home");
+        await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, {
+          withCredentials: true,
+        });
+        navigate('/home');
       } catch (error) {}
     };
     checkAuth();
@@ -29,12 +31,12 @@ function Login() {
         { withCredentials: true }
       );
       setMessage(response.data.message);
-    
+
       if (response) {
-        navigate("/home");
+        navigate('/home');
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || "Erro ao fazer login");
+      setMessage(error.response?.data?.message || 'Erro ao fazer login');
     }
   };
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Form, Button } from "react-bootstrap";
-import getApiUrl from "../util/api";
+import React, { useState, useEffect } from 'react';
+import { Form, Button } from 'react-bootstrap';
+import getApiUrl from '../util/api';
 
 const GeneralEventStudentSelector = ({
   levels,
@@ -18,10 +18,7 @@ const GeneralEventStudentSelector = ({
     <Form className="mt-4">
       <Form.Group className="mb-3">
         <Form.Label>Selecione o nível</Form.Label>
-        <Form.Select
-          value={selectedLevel || ""}
-          onChange={onLevelChange}
-        >
+        <Form.Select value={selectedLevel || ''} onChange={onLevelChange}>
           <option value="">Selecione...</option>
           {levels.map((level) => (
             <option key={level} value={level}>
@@ -34,7 +31,7 @@ const GeneralEventStudentSelector = ({
       <Form.Group className="mb-3">
         <Form.Label>Selecione o grupo</Form.Label>
         <Form.Select
-          value={selectedGroup?.id || ""}
+          value={selectedGroup?.id || ''}
           onChange={onGroupChange}
           disabled={!selectedLevel}
         >
@@ -52,7 +49,7 @@ const GeneralEventStudentSelector = ({
       <Form.Group className="mb-3">
         <Form.Label>Selecione o estudante</Form.Label>
         <Form.Select
-          value={selectedStudent?.registration || ""}
+          value={selectedStudent?.registration || ''}
           onChange={onStudentChange}
           disabled={!selectedGroup}
         >

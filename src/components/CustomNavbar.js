@@ -12,7 +12,10 @@ function CustomNavbar() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, { withCredentials: true });
+        const response = await axios.get(
+          `${getApiUrl()}/Account/IsAuthenticated`,
+          { withCredentials: true }
+        );
         if (response.status === 200) {
           setIsLoggedIn(true);
         }
@@ -25,7 +28,11 @@ function CustomNavbar() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${getApiUrl()}/Account/Logout`, {}, { withCredentials: true });
+      await axios.post(
+        `${getApiUrl()}/Account/Logout`,
+        {},
+        { withCredentials: true }
+      );
       setIsLoggedIn(false);
       navigate('/');
     } catch (error) {
@@ -53,7 +60,9 @@ function CustomNavbar() {
                 <NavDropdown.Item as="span">Relatorio geral</NavDropdown.Item>
               </LinkContainer>
               <LinkContainer to="/OrderList">
-                <NavDropdown.Item as="span">Relatorio de pedidos</NavDropdown.Item>
+                <NavDropdown.Item as="span">
+                  Relatorio de pedidos
+                </NavDropdown.Item>
               </LinkContainer>
             </NavDropdown>
 

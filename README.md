@@ -4,7 +4,6 @@
 Esse sistema está sendo desenvolvido em módulos com front-end em React.JS com Bootstrap através da biblioteca React Bootstrap e Back-end em C# com ASP.NET, PostgreSQL e Docker.
 </p>
 
-
 <h3>Módulos</h3>
 A prícipio esse sistema é constituido por 5 módulos:
 
@@ -26,8 +25,6 @@ Este módulo é responsável pelo cadastro de novos alunos em turmas já existen
 
 Módulo de Cadastro de Turmas
 Este módulo permite o cadastro de novas turmas no sistema, complementando a estrutura de gerenciamento de alunos e eventos.
-
-
 
 <h1>Portal Raiz (English)</h1>
 
