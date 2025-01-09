@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         policyBuilder => policyBuilder
+	    .WithOrigins("http://portalraizapi.xyz")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());

@@ -84,7 +84,7 @@ const App = () => {
         <Route path="/Shifts" element={<PrivateRoute element={<Shifts />} />} />
         <Route path="/Levels" element={<PrivateRoute element={<Levels />} />} />
         <Route
-          path="/GradesDetalhes"
+          path="/Grades"
           element={<PrivateRoute element={<Grades />} />}
         />
       </Routes>
