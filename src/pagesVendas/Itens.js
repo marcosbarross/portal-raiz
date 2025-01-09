@@ -13,6 +13,31 @@ function Itens() {
   const [busca, setBusca] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [produtoToDelete, setProdutoToDelete] = useState(null);
+  const [produtoToEdit, setProdutoToEdit] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleShowEditModal = (produto) => {
+    setProdutoToEdit({ ...produto });
+    setShowEditModal(true);
+  };
+  
+  const handleCloseEditModal = () => {
+    setProdutoToEdit(null);
+    setShowEditModal(false);
+  };
+
+  const handleUpdateProduto = () => {
+    if (produtoToEdit) {
+      axios
+        .put(`${getApiUrl()}/Product/UpdateProduct/${produtoToEdit.id}`, produtoToEdit)
+        .then(() => {
+          loadProdutos();
+          handleCloseEditModal();
+        })
+        .catch((error) => console.error('Error updating product:', error));
+    }
+  };
+  
 
   useEffect(() => {
     loadProdutos();
@@ -202,6 +227,14 @@ function Itens() {
                   >
                     Excluir
                   </Button>
+
+                  <Button
+                    variant="warning"
+                    className="me-2"
+                    onClick={() => handleShowEditModal(produto)}
+                  >
+                    Editar
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -225,6 +258,71 @@ function Itens() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={showEditModal} onHide={handleCloseEditModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Editar Produto</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {produtoToEdit && (
+          <>
+            <Form.Group>
+              <Form.Label>Nome</Form.Label>
+              <Form.Control
+                type="text"
+                value={produtoToEdit.name}
+                onChange={(e) =>
+                  setProdutoToEdit({ ...produtoToEdit, name: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Preço</Form.Label>
+              <Form.Control
+                type="number"
+                step="0.01"
+                value={produtoToEdit.price}
+                onChange={(e) =>
+                  setProdutoToEdit({ ...produtoToEdit, price: parseFloat(e.target.value) })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Tamanho</Form.Label>
+              <Form.Control
+                type="text"
+                value={produtoToEdit.size}
+                onChange={(e) =>
+                  setProdutoToEdit({ ...produtoToEdit, size: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Estoque</Form.Label>
+              <Form.Control
+                type="number"
+                value={produtoToEdit.remainingAmount}
+                onChange={(e) =>
+                  setProdutoToEdit({
+                    ...produtoToEdit,
+                    remainingAmount: parseInt(e.target.value),
+                  })
+                }
+              />
+            </Form.Group>
+          </>
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleCloseEditModal}>
+          Cancelar
+        </Button>
+        <Button variant="primary" onClick={handleUpdateProduto}>
+          Salvar
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
     </>
   );
 }

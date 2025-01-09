@@ -57,6 +57,25 @@ namespace api_raiz.Controllers
             return Ok(response);
         }
 
+        [HttpPut("UpdateProduct/{id}")]
+        public IActionResult UpdateProduct(int id, [FromBody] Product updatedProduct)
+        {
+            var product = _context.Products.Find(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            product.Name = updatedProduct.Name;
+            product.Price = updatedProduct.Price;
+            product.Size = updatedProduct.Size;
+            product.RemainingAmount = updatedProduct.RemainingAmount;
+
+            _context.SaveChanges();
+            return Ok();
+        }
+
+
         [HttpPost("SellProduct")]
         public IActionResult SellProduct([FromBody] List<OrderDto> orderItems)
         {
