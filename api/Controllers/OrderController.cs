@@ -36,6 +36,7 @@ namespace api_raiz.Controllers
                         order.OrderIdentificator,
                         student.Name,
                         product.Name,
+                        product.Size,
                         order.ProductQuantity,
                         order.Date,
                         product.Price
@@ -60,6 +61,7 @@ namespace api_raiz.Controllers
                 order.OrderIdentificator,
                 students.FirstOrDefault(s => s.Registration == order.StudentId)?.Name,
                 products.FirstOrDefault(p => p.Id == order.ProductId)?.Name,
+                (int)(products.FirstOrDefault(p => p.Id == order.ProductId)?.Size),
                 order.ProductQuantity,
                 order.Date,
                 products.FirstOrDefault(p => p.Id == order.ProductId).Price
@@ -82,6 +84,7 @@ namespace api_raiz.Controllers
                 order.OrderIdentificator,
                 students.FirstOrDefault(s => s.Registration == order.StudentId)?.Name,
                 products.FirstOrDefault(p => p.Id == order.ProductId)?.Name,
+                (int)products.FirstOrDefault(p => p.Id == order.ProductId)?.Size,
                 order.ProductQuantity,
                 order.Date,
                 products.FirstOrDefault(p => p.Id == order.ProductId).Price

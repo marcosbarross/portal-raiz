@@ -8,16 +8,18 @@ namespace api_raiz.Dtos.OrderDto
         public int Identificator { get; set; }
         public string StudentName { get; set; }
         public string ProductName { get; set; }
+        public int ProductSize { get; set; }
         public int Quantity { get; set; }
         public DateTime Date { get; set; }
         public double Price { get; set; }
         public double TotalPrice => Quantity * Price;
 
-        public OrderResponseDto(int identificator, string studentName, string productName, int quantity, DateTime date, double price)
+        public OrderResponseDto(int identificator, string studentName, string productName, int productSize, int quantity, DateTime date, double price)
         {
             Identificator = identificator;
             StudentName = studentName;
             ProductName = productName;
+            ProductSize = productSize;
             Quantity = quantity;
             Date = date;
             Price = price;

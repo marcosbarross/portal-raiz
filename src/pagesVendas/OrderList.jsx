@@ -26,7 +26,7 @@ const OrderList = () => {
       .get(`${getApiUrl()}/Order/GetOrders`)
       .then((response) => {
         if (response.data) {
-          setOrders(response.data); // Ajuste para lidar com o array direto
+          setOrders(response.data);
         } else {
           console.error('Resposta inesperada da API:', response.data);
         }
@@ -44,6 +44,7 @@ const OrderList = () => {
       if (existingOrder) {
         existingOrder.products.push({
           productName: order.productName,
+          productSize: order.productSize,
           quantity: order.quantity,
           price: order.price,
         });
@@ -55,10 +56,12 @@ const OrderList = () => {
           studentName: order.studentName,
           date: order.date,
           totalQuantity: order.quantity,
+          
           totalPrice: order.quantity * order.price,
           products: [
             {
               productName: order.productName,
+              productSize: order.productSize,
               quantity: order.quantity,
               price: order.price,
             },
@@ -68,7 +71,7 @@ const OrderList = () => {
       return acc;
     }, []);
     setGroupedOrders(grouped);
-    setFilteredOrders(grouped); // Inicialmente, exibe todos os pedidos
+    setFilteredOrders(grouped);
   }, [orders]);
 
   useEffect(() => {
@@ -247,8 +250,8 @@ const OrderList = () => {
                 <ul>
                   {selectedOrder.products.map((product, index) => (
                     <li key={index}>
-                      {product.productName} - {product.quantity} x{' '}
-                      {product.price.toFixed(2)}
+                      Produto: {product.productName}, tamanho: {product.productSize} - Quantidade: {product.quantity} x {' '}
+                      R$ {product.price.toFixed(2)}
                     </li>
                   ))}
                 </ul>
