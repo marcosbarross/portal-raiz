@@ -9,7 +9,6 @@ import {
   Modal,
 } from 'react-bootstrap';
 import axios from 'axios';
-import { jsPDF } from 'jspdf';
 import CustomNavbar from '../components/CustomNavbar';
 import getApiUrl from '../util/api';
 import StudentSelector from '../components/StudentSelector';
@@ -17,7 +16,9 @@ import StudentSelector from '../components/StudentSelector';
 function Vendas() {
   const [produtos, setProdutos] = useState([]);
   const [itensPedido, setItensPedido] = useState([]);
-  const [produtoId, setProdutoId] = useState('');
+  const [selectedProductName, setSelectedProductName] = useState('');
+  const [selectedSizeId, setSelectedSizeId] = useState('');
+  const [availableSizes, setAvailableSizes] = useState([]);
   const [quantidade, setQuantidade] = useState('');
   const [totalPedido, setTotalPedido] = useState(0);
   const [valorPago, setValorPago] = useState(0);
@@ -31,14 +32,42 @@ function Vendas() {
     axios
       .get(`${getApiUrl()}/Product/GetProducts`)
       .then((response) => {
-        const allProducts = [
+        const normalizedProducts = [
           ...(response.data.products || []),
           ...(response.data.productsAlternativeSize || []),
-        ].sort((a, b) => a.name.localeCompare(b.name));;
-        setProdutos(allProducts);
+        ].map(p => ({
+          ...p,
+          size: p.size.toString()
+        }));
+
+        const sortedProducts = normalizedProducts.sort((a, b) => 
+          a.name.localeCompare(b.name)
+        );
+        
+        setProdutos(sortedProducts);
       })
       .catch((error) => console.error('Erro ao carregar produtos:', error));
   }, []);
+
+  const groupedProducts = produtos.reduce((acc, product) => {
+    if (product.remainingAmount > 0) {
+      if (!acc[product.name]) {
+        acc[product.name] = [];
+      }
+      acc[product.name].push(product);
+    }
+    return acc;
+  }, {});
+
+  useEffect(() => {
+    if (selectedProductName && groupedProducts[selectedProductName]) {
+      const sizes = groupedProducts[selectedProductName].sort((a, b) =>
+        a.size.localeCompare(b.size, undefined, { numeric: true })
+      );
+      setAvailableSizes(sizes);
+      setSelectedSizeId('');
+    }
+  }, [selectedProductName]);
 
   useEffect(() => {
     calcularTotalPedido();
@@ -55,11 +84,19 @@ function Vendas() {
 
   const handleAddItem = (e) => {
     e.preventDefault();
-    const produto = produtos.find((p) => p.id === parseInt(produtoId));
+    const produto = produtos.find((p) => p.id === parseInt(selectedSizeId));
+    
     if (produto) {
+      if (produto.remainingAmount < parseInt(quantidade)) {
+        setModalMessage(`Quantidade insuficiente em estoque! Disponível: ${produto.remainingAmount}`);
+        setShowModal(true);
+        return;
+      }
+
       const itemExistente = itensPedido.find(
         (item) => item.productId === produto.id
       );
+      
       if (itemExistente) {
         setItensPedido(
           itensPedido.map((item) =>
@@ -80,7 +117,8 @@ function Vendas() {
           },
         ]);
       }
-      setProdutoId('');
+      setSelectedProductName('');
+      setSelectedSizeId('');
       setQuantidade('');
     }
   };
@@ -120,12 +158,19 @@ function Vendas() {
           setItensPedido([]);
           setModalMessage('Pedido realizado com sucesso!');
           setShowModal(true);
+
+          axios.get(`${getApiUrl()}/Product/GetProducts`)
+            .then(response => {
+              const normalizedProducts = [
+                ...(response.data.products || []),
+                ...(response.data.productsAlternativeSize || []),
+              ].map(p => ({ ...p, size: p.size.toString() }));
+              setProdutos(normalizedProducts.sort((a, b) => a.name.localeCompare(b.name)));
+            });
         })
         .catch((error) => {
           console.error('Erro ao enviar pedido:', error);
-          setModalMessage(
-            'Ocorreu um erro ao enviar o pedido. Verifique os logs.'
-          );
+          setModalMessage('Erro ao processar pedido. Tente novamente.');
           setShowModal(true);
         });
     } else {
@@ -145,26 +190,55 @@ function Vendas() {
 
         <Form onSubmit={handleAddItem} className="mt-3">
           <h2>Selecione o produto: </h2>
-          <Form.Group>
-            <Form.Label>Produto</Form.Label>
-            <Form.Control
-              as="select"
-              value={produtoId}
-              onChange={(e) => setProdutoId(e.target.value)}
-              required
-            >
-              <option value="">Selecione um produto</option>
-              {produtos.map((produto) => (
-                <option key={produto.id} value={produto.id}>
-                  {`${produto.name}, tamanho: ${produto.size}`}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-          <Form.Group>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Produto</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={selectedProductName}
+                  onChange={(e) => setSelectedProductName(e.target.value)}
+                  required
+                >
+                  <option value="">Selecione um produto</option>
+                  {Object.keys(groupedProducts)
+                    .sort()
+                    .map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                </Form.Control>
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              {selectedProductName && (
+                <Form.Group>
+                  <Form.Label>Tamanhos disponíveis</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={selectedSizeId}
+                    onChange={(e) => setSelectedSizeId(e.target.value)}
+                    required
+                  >
+                    <option value="">Selecione o tamanho</option>
+                    {availableSizes.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.size} (Estoque: {product.remainingAmount})
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              )}
+            </Col>
+          </Row>
+
+          <Form.Group className="mt-3">
             <Form.Label>Quantidade</Form.Label>
             <Form.Control
               type="number"
+              min="1"
               value={quantidade}
               onChange={(e) => setQuantidade(e.target.value)}
               required
@@ -174,6 +248,7 @@ function Vendas() {
             Adicionar ao pedido
           </Button>
         </Form>
+
         <hr />
         <h2 className="mt-5">Itens do pedido</h2>
         <Table striped bordered hover>
@@ -182,7 +257,7 @@ function Vendas() {
               <th>Produto</th>
               <th>Tamanho</th>
               <th>Quantidade</th>
-              <th>Preço</th>
+              <th>Preço Unitário</th>
               <th>Subtotal</th>
               <th>Ações</th>
             </tr>
@@ -193,8 +268,8 @@ function Vendas() {
                 <td>{item.productName}</td>
                 <td>{item.productSize}</td>
                 <td>{item.quantity}</td>
-                <td>{item.productPrice.toFixed(2)}</td>
-                <td>{(item.productPrice * item.quantity).toFixed(2)}</td>
+                <td>R$ {item.productPrice.toFixed(2)}</td>
+                <td>R$ {(item.productPrice * item.quantity).toFixed(2)}</td>
                 <td>
                   <Button
                     size="sm"
@@ -224,6 +299,8 @@ function Vendas() {
               <Form.Label>Valor pago</Form.Label>
               <Form.Control
                 type="number"
+                min="0"
+                step="0.01"
                 value={valorPago}
                 onChange={(e) => setValorPago(Number(e.target.value))}
               />
@@ -240,12 +317,16 @@ function Vendas() {
             </Form.Group>
           </Col>
           <Col>
-            <h4>Troco: R$ {troco.toFixed(2)}</h4>
+            <h4>Troco: R$ {Math.max(troco, 0).toFixed(2)}</h4>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Button className="mt-3" onClick={handleSubmitPedido}>
+            <Button 
+              className="mt-3" 
+              onClick={handleSubmitPedido}
+              disabled={itensPedido.length === 0}
+            >
               Finalizar Pedido
             </Button>
           </Col>

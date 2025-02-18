@@ -20,6 +20,8 @@ const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
 
   useEffect(() => {
     axios
@@ -56,7 +58,6 @@ const OrderList = () => {
           studentName: order.studentName,
           date: order.date,
           totalQuantity: order.quantity,
-          
           totalPrice: order.quantity * order.price,
           products: [
             {
@@ -83,6 +84,59 @@ const OrderList = () => {
     setFilteredOrders(filtered);
   }, [searchTerm, groupedOrders]);
 
+  const handleSort = (column) => {
+    let direction = 'asc';
+    if (sortColumn === column && sortDirection === 'asc') {
+      direction = 'desc';
+    }
+    setSortColumn(column);
+    setSortDirection(direction);
+  };
+
+  const getSortedOrders = () => {
+    if (!sortColumn) return filteredOrders;
+
+    return [...filteredOrders].sort((a, b) => {
+      let valueA, valueB;
+      
+      switch(sortColumn) {
+        case 'identificator':
+          return sortDirection === 'asc' 
+            ? a.identificator - b.identificator 
+            : b.identificator - a.identificator;
+        
+        case 'studentName':
+          valueA = a.studentName.toLowerCase();
+          valueB = b.studentName.toLowerCase();
+          break;
+        
+        case 'date':
+          valueA = new Date(a.date);
+          valueB = new Date(b.date);
+          break;
+        
+        case 'totalPrice':
+          return sortDirection === 'asc' 
+            ? a.totalPrice - b.totalPrice 
+            : b.totalPrice - a.totalPrice;
+        
+        default:
+          return 0;
+      }
+
+      if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const getSortIndicator = (column) => {
+    if (sortColumn === column) {
+      return sortDirection === 'asc' ? ' ↑' : ' ↓';
+    }
+    return '';
+  };
+
   const handleShowDetails = (order) => {
     setSelectedOrder(order);
     setShowModal(true);
@@ -103,8 +157,8 @@ const OrderList = () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     let startX = 5;
     let startY = 10;
-    let lineHeight = 4;
-    let columnWidth = 18;
+    const lineHeight = 4;
+    const columnWidth = 18;
 
     doc.setFontSize(8);
     doc.text('EDUCANDÁRIO RAIZ DO SABER', pageWidth / 2, startY, {
@@ -135,7 +189,6 @@ const OrderList = () => {
     startY += lineHeight;
 
     doc.line(startX, startY, pageWidth - startX, startY);
-
     startY += lineHeight + 2;
 
     doc.text('Produto', startX, startY);
@@ -188,15 +241,35 @@ const OrderList = () => {
             <Table striped bordered hover className="mt-3">
               <thead>
                 <tr>
-                  <th>Número do pedido</th>
-                  <th>Nome do estudante</th>
-                  <th>Data</th>
-                  <th>Valor total</th>
+                  <th 
+                    onClick={() => handleSort('identificator')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Número do pedido{getSortIndicator('identificator')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('studentName')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Nome do estudante{getSortIndicator('studentName')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('date')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Data{getSortIndicator('date')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('totalPrice')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Valor total{getSortIndicator('totalPrice')}
+                  </th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => (
+                {getSortedOrders().map((order) => (
                   <tr key={order.identificator}>
                     <td>{order.identificator}</td>
                     <td>{order.studentName}</td>
@@ -267,7 +340,7 @@ const OrderList = () => {
                 variant="primary"
                 onClick={() => generateReceipt(selectedOrder)}
               >
-                Gerar Recibo
+                Gerar recibo
               </Button>
             )}
           </Modal.Footer>
