@@ -34,7 +34,7 @@ function Vendas() {
         const allProducts = [
           ...(response.data.products || []),
           ...(response.data.productsAlternativeSize || []),
-        ];
+        ].sort((a, b) => a.name.localeCompare(b.name));;
         setProdutos(allProducts);
       })
       .catch((error) => console.error('Erro ao carregar produtos:', error));

@@ -14,21 +14,22 @@ const StudentSelector = ({ onStudentSelect }) => {
 
   useEffect(() => {
     axios
-      .get(`${getApiUrl()}/Group/GetGroupsDetails`)
-      .then((response) => {
-        const groupsData = response.data || [];
-        setGroups(groupsData);
-
-        const uniqueLevels = [
-          ...new Map(
-            groupsData.map((group) => [
-              group.level,
-              { id: group.level, name: group.level },
-            ])
-          ).values(),
-        ];
-        setLevels(uniqueLevels);
-      })
+    .get(`${getApiUrl()}/Group/GetGroupsDetails`)
+    .then((response) => {
+      const groupsData = response.data || [];
+      const sortedGroups = groupsData.sort((a, b) => a.name.localeCompare(b.name));
+      setGroups(sortedGroups);
+      const uniqueLevels = [
+        ...new Map(
+          sortedGroups.map((group) => [
+            group.level,
+            { id: group.level, name: group.level },
+          ])
+        ).values(),
+      ].sort((a, b) => a.name.localeCompare(b.name));
+      
+      setLevels(uniqueLevels);
+    })
       .catch((error) => console.error('Erro ao buscar grupos:', error));
   }, []);
 
@@ -46,11 +47,12 @@ const StudentSelector = ({ onStudentSelect }) => {
 
     if (groupId) {
       axios
-        .get(`${getApiUrl()}/Student/GetStudentsByGroup/${groupId}`)
-        .then((response) => {
-          const studentsData = response.data || [];
-          setStudents(studentsData);
-        })
+      .get(`${getApiUrl()}/Student/GetStudentsByGroup/${groupId}`)
+      .then((response) => {
+        const studentsData = response.data || [];
+        const sortedStudents = studentsData.sort((a, b) => a.name.localeCompare(b.name));
+        setStudents(sortedStudents);
+      })
         .catch((error) => console.error('Erro ao buscar alunos:', error));
     } else {
       setStudents([]);
@@ -93,6 +95,7 @@ const StudentSelector = ({ onStudentSelect }) => {
             <option value="">Selecione...</option>
             {groups
               .filter((group) => group.level === selectedLevel)
+              .sort((a, b) => a.name.localeCompare(b.name)) // Ordenação adicional para garantir
               .map((group) => (
                 <option key={group.id} value={group.id}>
                   {group.name} - {group.shift}
