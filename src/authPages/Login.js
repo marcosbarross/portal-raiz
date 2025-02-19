@@ -19,7 +19,7 @@ function Login() {
         const response = await axios.get(`${getApiUrl()}/Account/IsAuthenticated`, {
           withCredentials: true,
         });
-        if (response.data.authenticated) {
+        if (response) {
           navigate('/home');
         }
       } catch (error) {
