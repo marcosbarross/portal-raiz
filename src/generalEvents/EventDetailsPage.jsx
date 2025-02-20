@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Accordion, Table, Button, Modal } from 'react-bootstrap';
+import { Container, Accordion, Table, Button, Modal, Form } from 'react-bootstrap';
 import CustomNavbar from '../components/CustomNavbar';
 import getApiUrl from '../util/api';
 import GeneralEventStudentSelector from './GeneralEventStudentSelector';
@@ -19,6 +19,7 @@ function GeneralEventDetailsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de busca
 
   const fetchEventDetails = () => {
     fetch(`${getApiUrl()}/GeneralEvent/GetGeneralEventDetails/${id}`)
@@ -144,6 +145,17 @@ function GeneralEventDetailsPage() {
 
   const groupedStudents = groupStudentsByGroupAndShift();
 
+  const filteredGroupKeys = Object.keys(groupedStudents)
+    .sort((a, b) => a.localeCompare(b))
+    .filter((groupKey) => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return (
+        groupKey.toLowerCase().includes(lowerCaseSearchTerm) ||
+        groupedStudents[groupKey].some((student) =>
+          student.name.toLowerCase().includes(lowerCaseSearchTerm)
+      ))
+    });
+
   return (
     <>
       <CustomNavbar />
@@ -210,70 +222,75 @@ function GeneralEventDetailsPage() {
           <strong>Preço Total:</strong> R$ {event.totalPrice.toFixed(2)}
         </p>
 
+        {/* Campo de busca */}
+        <Form.Group controlId="search" className="mt-4">
+          <Form.Control
+            type="text"
+            placeholder="Buscar por turma ou aluno..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </Form.Group>
+
         <h3>Alunos por turma</h3>
         <Accordion className="mt-4">
-          {Object.keys(groupedStudents)
-            .sort((a, b) => a.localeCompare(b))
-            .map((groupKey, index) => (
-              <Accordion.Item eventKey={index.toString()} key={groupKey}>
-                <Accordion.Header>{groupKey}</Accordion.Header>
-                <Accordion.Body>
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Nome</th>
-                        <th>Responsável</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {groupedStudents[groupKey].length > 0 ? (
-                        groupedStudents[groupKey].map(
-                          (student, studentIndex) => (
-                            <tr key={studentIndex}>
-                              <td>{studentIndex + 1}</td>
-                              <td>{student?.name || 'Nome não disponível'}</td>
-                              <td>
-                                {student?.responsible ||
-                                  'Responsável não disponível'}
-                              </td>
-                              <td>
-                                <Button
-                                  variant="info"
-                                  size="sm"
-                                  onClick={() => {
-                                    window.location.href = `/event/${id}/student/${student.registration}/payments`;
-                                  }}
-                                >
-                                  Caixa
-                                </Button>{' '}
-                                <Button
-                                  variant="danger"
-                                  size="sm"
-                                  onClick={() => {
-                                    setStudentToDelete(student.registration);
-                                    setShowDeleteModal(true);
-                                  }}
-                                >
-                                  Excluir
-                                </Button>
-                              </td>
-                            </tr>
-                          )
-                        )
-                      ) : (
-                        <tr>
-                          <td colSpan="4" className="text-center">
-                            Nenhum aluno neste grupo.
+          {filteredGroupKeys.map((groupKey, index) => (
+            <Accordion.Item eventKey={index.toString()} key={groupKey}>
+              <Accordion.Header>{groupKey}</Accordion.Header>
+              <Accordion.Body>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nome</th>
+                      <th>Responsável</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groupedStudents[groupKey].length > 0 ? (
+                      groupedStudents[groupKey].map((student, studentIndex) => (
+                        <tr key={studentIndex}>
+                          <td>{studentIndex + 1}</td>
+                          <td>{student?.name || 'Nome não disponível'}</td>
+                          <td>
+                            {student?.responsible || 'Responsável não disponível'}
+                          </td>
+                          <td>
+                            <Button
+                              variant="info"
+                              size="sm"
+                              onClick={() => {
+                                window.location.href = `/event/${id}/student/${student.registration}/payments`;
+                              }}
+                            >
+                              Caixa
+                            </Button>{' '}
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => {
+                                setStudentToDelete(student.registration);
+                                setShowDeleteModal(true);
+                              }}
+                            >
+                              Excluir
+                            </Button>
                           </td>
                         </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                </Accordion.Body>
-              </Accordion.Item>
-            ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">
+                          Nenhum aluno neste grupo.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </Accordion.Body>
+            </Accordion.Item>
+          ))}
         </Accordion>
 
         <Button
