@@ -24,6 +24,7 @@ function GeneralEventsPage() {
   const [success, setSuccess] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [eventIdToDelete, setEventIdToDelete] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,6 +81,7 @@ function GeneralEventsPage() {
         setInstallments('');
         setDate('');
         setTotalPrice('');
+        setShowForm(false);
         loadGeneralEvents();
       } else {
         setError('Erro ao cadastrar evento. Tente novamente.');
@@ -123,68 +125,82 @@ function GeneralEventsPage() {
 
       <Container className="mb-3">
         <br />
-        <h3>Cadastrar novo evento geral</h3>
+        <h3>Eventos gerais</h3>
 
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
+        {/* Botão para exibir/ocultar o formulário */}
+        <Button
+          variant="primary"
+          onClick={() => setShowForm(!showForm)}
+          className="mb-3"
+        >
+          {showForm ? 'Fechar formulário' : 'Cadastrar novo evento'}
+        </Button>
 
-        <Form onSubmit={handleSubmit}>
-          <FloatingLabel
-            controlId="floatingInput"
-            label="Nome do evento"
-            className="mb-3"
-          >
-            <Form.Control
-              type="text"
-              placeholder="Nome do evento"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </FloatingLabel>
-          <FloatingLabel
-            controlId="floatingInput"
-            label="Parcelas"
-            className="mb-3"
-          >
-            <Form.Control
-              type="number"
-              placeholder="Parcelas"
-              value={installments}
-              onChange={(e) => setInstallments(e.target.value)}
-            />
-          </FloatingLabel>
-          <FloatingLabel
-            controlId="floatingInput"
-            label="Data"
-            className="mb-3"
-          >
-            <Form.Control
-              type="date"
-              placeholder="Data"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </FloatingLabel>
-          <FloatingLabel
-            controlId="floatingInput"
-            label="Preço Total"
-            className="mb-3"
-          >
-            <Form.Control
-              type="number"
-              step="0.01"
-              placeholder="Preço Total"
-              value={totalPrice}
-              onChange={(e) => setTotalPrice(e.target.value)}
-            />
-          </FloatingLabel>
-          <Button variant="primary" type="submit">
-            Cadastrar
-          </Button>
-        </Form>
+        {/* Formulário de cadastro (condicionalmente renderizado) */}
+        {showForm && (
+          <>
+            <h4>Cadastrar novo evento geral</h4>
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
+
+            <Form onSubmit={handleSubmit}>
+              <FloatingLabel
+                controlId="floatingInput"
+                label="Nome do evento"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="text"
+                  placeholder="Nome do evento"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </FloatingLabel>
+              <FloatingLabel
+                controlId="floatingInput"
+                label="Parcelas"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="number"
+                  placeholder="Parcelas"
+                  value={installments}
+                  onChange={(e) => setInstallments(e.target.value)}
+                />
+              </FloatingLabel>
+              <FloatingLabel
+                controlId="floatingInput"
+                label="Data"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="date"
+                  placeholder="Data"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </FloatingLabel>
+              <FloatingLabel
+                controlId="floatingInput"
+                label="Preço Total"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="number"
+                  step="0.01"
+                  placeholder="Preço Total"
+                  value={totalPrice}
+                  onChange={(e) => setTotalPrice(e.target.value)}
+                />
+              </FloatingLabel>
+              <Button variant="primary" type="submit">
+                Cadastrar
+              </Button>
+            </Form>
+          </>
+        )}
 
         <br />
-        <h3>Eventos gerais</h3>
 
         {loading ? (
           <Spinner animation="border" />
