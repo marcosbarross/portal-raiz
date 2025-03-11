@@ -19,9 +19,13 @@ const OrderList = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [showDateFilterModal, setShowDateFilterModal] = useState(false);
+  const [dateFilterText, setDateFilterText] = useState('');
 
   useEffect(() => {
     axios
@@ -76,13 +80,31 @@ const OrderList = () => {
   }, [orders]);
 
   useEffect(() => {
-    const filtered = groupedOrders.filter(
-      (order) =>
+    const filtered = groupedOrders.filter((order) => {
+      const orderDate = new Date(order.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+  
+      if (end) {
+        end.setHours(23, 59, 59, 999);
+      }
+  
+      console.log('Order Date:', orderDate);
+      console.log('Start Date:', start);
+      console.log('End Date:', end);
+  
+      const matchesSearchTerm =
         order.identificator.toString().includes(searchTerm) ||
-        order.studentName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        order.studentName.toLowerCase().includes(searchTerm.toLowerCase());
+  
+      const matchesDateRange =
+        (!start || orderDate >= start) && (!end || orderDate <= end);
+  
+      return matchesSearchTerm && matchesDateRange;
+    });
+  
     setFilteredOrders(filtered);
-  }, [searchTerm, groupedOrders]);
+  }, [searchTerm, groupedOrders, startDate, endDate]);
 
   const handleSort = (column) => {
     let direction = 'asc';
@@ -98,28 +120,28 @@ const OrderList = () => {
 
     return [...filteredOrders].sort((a, b) => {
       let valueA, valueB;
-      
-      switch(sortColumn) {
+
+      switch (sortColumn) {
         case 'identificator':
-          return sortDirection === 'asc' 
-            ? a.identificator - b.identificator 
+          return sortDirection === 'asc'
+            ? a.identificator - b.identificator
             : b.identificator - a.identificator;
-        
+
         case 'studentName':
           valueA = a.studentName.toLowerCase();
           valueB = b.studentName.toLowerCase();
           break;
-        
+
         case 'date':
           valueA = new Date(a.date);
           valueB = new Date(b.date);
           break;
-        
+
         case 'totalPrice':
-          return sortDirection === 'asc' 
-            ? a.totalPrice - b.totalPrice 
+          return sortDirection === 'asc'
+            ? a.totalPrice - b.totalPrice
             : b.totalPrice - a.totalPrice;
-        
+
         default:
           return 0;
       }
@@ -139,12 +161,29 @@ const OrderList = () => {
 
   const handleShowDetails = (order) => {
     setSelectedOrder(order);
-    setShowModal(true);
+    setShowDetailsModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleCloseDetailsModal = () => {
+    setShowDetailsModal(false);
     setSelectedOrder(null);
+  };
+
+  const handleOpenDateFilterModal = () => {
+    setShowDateFilterModal(true);
+  };
+
+  const handleCloseDateFilterModal = () => {
+    setShowDateFilterModal(false);
+  };
+
+  const handleApplyDateFilter = () => {
+    setShowDateFilterModal(false);
+    if (startDate && endDate) {
+      setDateFilterText(`Exibindo resultados do intervalo entre ${startDate} e ${endDate}`);
+    } else {
+      setDateFilterText('');
+    }
   };
 
   const generateReceipt = (order) => {
@@ -238,28 +277,37 @@ const OrderList = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </Form.Group>
+            <br />
+            <Row className="mb-3">
+              <Col>
+                <Button variant="primary" onClick={handleOpenDateFilterModal}>
+                  Filtrar por data
+                </Button>
+              </Col>
+            </Row>
+            {dateFilterText && <p>{dateFilterText}</p>}
             <Table striped bordered hover className="mt-3">
               <thead>
                 <tr>
-                  <th 
+                  <th
                     onClick={() => handleSort('identificator')}
                     style={{ cursor: 'pointer' }}
                   >
                     Número do pedido{getSortIndicator('identificator')}
                   </th>
-                  <th 
+                  <th
                     onClick={() => handleSort('studentName')}
                     style={{ cursor: 'pointer' }}
                   >
                     Nome do estudante{getSortIndicator('studentName')}
                   </th>
-                  <th 
+                  <th
                     onClick={() => handleSort('date')}
                     style={{ cursor: 'pointer' }}
                   >
                     Data{getSortIndicator('date')}
                   </th>
-                  <th 
+                  <th
                     onClick={() => handleSort('totalPrice')}
                     style={{ cursor: 'pointer' }}
                   >
@@ -290,7 +338,8 @@ const OrderList = () => {
           </Col>
         </Row>
 
-        <Modal show={showModal} onHide={handleCloseModal}>
+        {/* Modal de Detalhes do Pedido */}
+        <Modal show={showDetailsModal} onHide={handleCloseDetailsModal}>
           <Modal.Header closeButton>
             <Modal.Title>Detalhes do pedido</Modal.Title>
           </Modal.Header>
@@ -332,7 +381,7 @@ const OrderList = () => {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>
+            <Button variant="secondary" onClick={handleCloseDetailsModal}>
               Fechar
             </Button>
             {selectedOrder && (
@@ -343,6 +392,40 @@ const OrderList = () => {
                 Gerar recibo
               </Button>
             )}
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={showDateFilterModal} onHide={handleCloseDateFilterModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Filtrar por data</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId="startDate">
+                <Form.Label>Data de início</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group controlId="endDate">
+                <Form.Label>Data de fim</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseDateFilterModal}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleApplyDateFilter}>
+              Aplicar
+            </Button>
           </Modal.Footer>
         </Modal>
       </Container>
