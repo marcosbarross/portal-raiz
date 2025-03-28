@@ -74,7 +74,7 @@ function Grades() {
   };
 
   const handleDetails = (id) => {
-    navigate(`/GradeDetalhe/${id}`);
+    navigate(`/TurmaDetalhe/${id}`);
   };
 
   const renderGradesByLevel = (levelId) => {

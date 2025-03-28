@@ -114,7 +114,7 @@ const StudentSelector = ({ onStudentSelect }) => {
             <option value="">Selecione...</option>
             {students.map((student) => (
               <option key={student.registration} value={student.registration}>
-                {student.name} - {student.responsible}
+                {student.name} - responsável: {student.responsible}
               </option>
             ))}
           </Form.Select>
@@ -131,7 +131,7 @@ const StudentSelector = ({ onStudentSelect }) => {
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Estudante Selecionado</Modal.Title>
+          <Modal.Title>Estudante selecionado</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           O estudante{' '}
